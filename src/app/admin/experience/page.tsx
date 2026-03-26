@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Sparkles, GripVertical, Save, Image as ImageIcon, ToggleLeft, ToggleRight, Play, Info } from 'lucide-react';
+import { Sparkles, GripVertical, Save, Image as ImageIcon, ToggleLeft, ToggleRight, Play, Info, GraduationCap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -186,72 +186,80 @@ export default function AdminExperiencePage() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
-      <div className="flex items-center justify-between">
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-            <Sparkles className="h-8 w-8 text-primary" />
-            Experiência do Aluno
-          </h2>
-          <p className="text-zinc-400 mt-2">Personalize a Home (estilo Netflix), capas, textos e ordenação.</p>
+          <div className="flex items-center gap-2 text-primary mb-2">
+            <Sparkles className="h-4 w-4" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Branding & Interface</span>
+          </div>
+          <h2 className="text-4xl font-heading font-bold tracking-tight text-white uppercase">Experiência do Aluno</h2>
+          <p className="text-zinc-500 text-sm mt-1">Personalização estética e curadoria da identidade visual Home.</p>
         </div>
-        <Button onClick={handleSave} disabled={saving} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+        <Button onClick={handleSave} disabled={saving} variant="premium" className="h-10 text-[10px] font-bold tracking-widest uppercase px-6">
           <Save className="w-4 h-4 mr-2" />
-          {saving ? 'Gravando no Banco...' : 'Salvar Configurações'}
+          {saving ? 'PROCESSANDO...' : 'PUBLICAR NA HOME'}
         </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className="bg-black/40 border-white/10 backdrop-blur-md">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">Banner Principal</CardTitle>
-            <CardDescription className="text-zinc-400">O grande destaque inicial ao entrar na plataforma.</CardDescription>
+        <Card className="bg-black/40 border-white/5 backdrop-blur-2xl overflow-hidden group">
+          <CardHeader className="border-b border-white/5 bg-white/[0.02]">
+            <CardTitle className="text-white font-heading font-medium">Arquitetura do Hero Banner</CardTitle>
+            <CardDescription className="text-zinc-500 text-xs">O impacto visual prioritário da plataforma Premium.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-8 p-8">
             <div 
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`aspect-[21/9] w-full bg-zinc-900 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-3 cursor-pointer transition-all relative overflow-hidden group ${isDragging ? 'border-primary bg-primary/10 scale-[1.02]' : 'border-zinc-700 hover:border-primary/50'}`}
+              className={`aspect-[21/9] w-full bg-zinc-900/50 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-4 cursor-pointer transition-all duration-500 relative overflow-hidden group/upload shadow-inner ${isDragging ? 'border-primary bg-primary/10 scale-[1.01]' : 'border-white/5 hover:border-primary/30'}`}
             >
-              <img src={bannerImage} alt="Banner Preview" className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-10 transition-opacity" />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/50 transition-colors z-10" />
-              <ImageIcon className={`h-10 w-10 relative z-20 transition-transform duration-300 group-hover:scale-110 ${isDragging ? 'text-primary scale-125' : 'text-zinc-300'}`} />
-              <span className="text-sm font-medium text-white relative z-20 text-center px-4 drop-shadow-md">
-                {isDragging ? 'Solte a imagem para usar no Banner!' : 'Clique ou arraste uma imagem aqui para fazer Upload Real'}
-              </span>
+              <img src={bannerImage} alt="Banner Preview" className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover/upload:opacity-10 transition-opacity duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
+              <div className="h-14 w-14 bg-white/5 rounded-full flex items-center justify-center border border-white/10 group-hover/upload:border-primary/30 transition-all z-20">
+                 <ImageIcon className={`h-6 w-6 transition-transform duration-500 group-hover/upload:scale-110 ${isDragging ? 'text-primary scale-125' : 'text-zinc-500'}`} />
+              </div>
+              <div className="text-center relative z-20 px-6">
+                <p className="text-[10px] font-bold text-white uppercase tracking-widest mb-1 shadow-sm">
+                  {isDragging ? 'SOLTE PARA IMPORTAR' : 'UPLOAD DE IMAGEM ESTRATÉGICA'}
+                </p>
+                <p className="text-[9px] text-zinc-500 font-medium uppercase tracking-widest">Recomendado: 1920x800px</p>
+              </div>
             </div>
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-zinc-300">URL da Imagem (Opção por Link)</Label>
-                <Input value={bannerImage} onChange={e => setBannerImage(e.target.value)} className="bg-black/20 border-white/10 text-white focus-visible:ring-primary/50 placeholder:text-zinc-600" placeholder="https://..." />
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div className="space-y-3">
+                    <Label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">Título de Impacto</Label>
+                    <Input value={bannerTitle} onChange={e => setBannerTitle(e.target.value)} className="bg-white/[0.03] border-white/10 text-sm h-12 uppercase tracking-wide font-medium" />
+                 </div>
+                 <div className="space-y-3">
+                    <Label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">Texto do CTA</Label>
+                    <Input value={bannerButton} onChange={e => setBannerButton(e.target.value)} className="bg-white/[0.03] border-white/10 text-sm h-12 uppercase tracking-wide font-medium" />
+                 </div>
               </div>
-              <div className="space-y-2">
-                <Label className="text-zinc-300">Título do Banner</Label>
-                <Input value={bannerTitle} onChange={e => setBannerTitle(e.target.value)} className="bg-black/20 border-white/10 text-white focus-visible:ring-primary/50" />
+              <div className="space-y-3">
+                <Label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">Narrativa do Banner (Subtítulo)</Label>
+                <Input value={bannerSubtitle} onChange={e => setBannerSubtitle(e.target.value)} className="bg-white/[0.03] border-white/10 text-sm h-12 font-medium" />
               </div>
-              <div className="space-y-2">
-                <Label className="text-zinc-300">Subtítulo (Resumo)</Label>
-                <Input value={bannerSubtitle} onChange={e => setBannerSubtitle(e.target.value)} className="bg-black/20 border-white/10 text-white focus-visible:ring-primary/50" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-zinc-300">Texto do Botão CTA</Label>
-                <Input value={bannerButton} onChange={e => setBannerButton(e.target.value)} className="bg-black/20 border-white/10 text-white focus-visible:ring-primary/50" />
+              <div className="space-y-3">
+                <Label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">Endereço da Imagem (Opcional)</Label>
+                <Input value={bannerImage} onChange={e => setBannerImage(e.target.value)} className="bg-white/[0.03] border-white/10 text-xs h-10 font-medium" placeholder="https://..." />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <div className="space-y-8">
-          <Card className="bg-black/40 border-white/10 backdrop-blur-md">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">Seções da Home</CardTitle>
-              <CardDescription className="text-zinc-400">Arraste para reordenar. Oculte as que não desejar exibir.</CardDescription>
+          <Card className="bg-black/40 border-white/5 backdrop-blur-2xl overflow-hidden shadow-2xl">
+            <CardHeader className="border-b border-white/5 bg-white/[0.02]">
+              <CardTitle className="text-white font-heading font-medium">Organização Modular da Home</CardTitle>
+              <CardDescription className="text-zinc-500 text-xs">Arraste para definir a hierarquia das seções pedagógicas.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <SortableContext items={sections} strategy={verticalListSortingStrategy}>
                   {sections.map((section) => (
@@ -259,67 +267,92 @@ export default function AdminExperiencePage() {
                   ))}
                 </SortableContext>
               </DndContext>
+              <div className="mt-8 p-6 bg-primary/[0.03] border border-primary/10 rounded-2xl flex items-start gap-4">
+                 <div className="h-8 w-8 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/20 shrink-0 mt-1">
+                    <Info className="h-4 w-4 text-primary" />
+                 </div>
+                 <p className="text-[11px] text-zinc-500 leading-relaxed font-medium">As seções são dinâmicas. Se um aluno não possuir progresso em "Continue Assistindo", a seção será omitida automaticamente para manter a estética limpa.</p>
+              </div>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      <div className="mt-16 pt-8 border-t border-white/10 space-y-6">
-        <div>
-          <h3 className="text-2xl font-bold text-white flex items-center gap-2">Preview da Área de Membros</h3>
-          <p className="text-zinc-400">Visualize em tempo real como a home do aluno está ficando.</p>
+      <div className="mt-16 space-y-8">
+        <div className="flex items-center gap-4">
+           <div className="h-12 w-12 bg-white/5 rounded-full flex items-center justify-center border border-white/5 shadow-inner">
+              <Play className="h-5 w-5 text-primary fill-primary/20" />
+           </div>
+           <div>
+              <h3 className="text-2xl font-heading font-bold text-white uppercase tracking-tight">Cenário de Visualização (Preview)</h3>
+              <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">Simulação em ambiente real de produção</p>
+           </div>
         </div>
         
-        <div className="w-full border border-white/10 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] bg-[#050806] ring-1 ring-white/5 relative h-[700px] overflow-y-auto style-scrollbar-hide">
-          <div className="absolute top-0 w-full h-20 bg-gradient-to-b from-black/80 to-transparent z-50 px-8 flex items-center pointer-events-none">
-             <div className="font-bold text-white tracking-tight text-xl opacity-80">SBH <span className="text-primary opacity-90">Premium</span></div>
+        <div className="w-full border border-white/10 rounded-[40px] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] bg-[#050806] ring-1 ring-white/10 relative h-[800px] overflow-y-auto style-scrollbar-hide group/preview">
+          <div className="absolute top-0 w-full h-24 bg-gradient-to-b from-black/90 via-black/40 to-transparent z-50 px-12 flex items-center pointer-events-none border-b border-white/[0.02]">
+             <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/20 mr-4">
+               <GraduationCap className="h-6 w-6 text-primary" />
+             </div>
+             <div className="font-heading font-bold text-white tracking-widest text-2xl">SBH <span className="text-primary">PLATINUM</span></div>
           </div>
           
-          <div className="relative w-full h-[450px] flex items-end pb-16 border-b border-white/5">
+          <div className="relative w-full h-[550px] flex items-end pb-24 group/hero">
             <img 
               src={bannerImage || 'https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=1920&q=80'}
               alt="Banner Preview"
-              className="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-screen"
+              className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover/preview:scale-[1.02] transition-transform duration-[3000ms]"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#050806] via-black/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#050806] via-[#050806]/60 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#050806] via-transparent to-transparent" />
+            <div className="absolute bottom-0 left-0 w-full h-[50%] bg-gradient-to-t from-[#050806] to-transparent pointer-events-none" />
             
-            <div className="relative z-10 px-8 max-w-3xl space-y-4">
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white drop-shadow-lg leading-tight uppercase">
-                {bannerTitle || 'Título do Banner'}
+            <div className="relative z-10 px-12 max-w-4xl space-y-6">
+              <Badge variant="premium" className="h-6 px-3 text-[9px] tracking-[0.4em] mb-2 font-black">CURADORIA SBH</Badge>
+              <h1 className="text-5xl md:text-7xl font-heading font-bold tracking-tight text-white drop-shadow-2xl leading-[1.05] uppercase">
+                {bannerTitle || 'CURSO DE IMPACTO'}
               </h1>
-              <p className="text-base text-zinc-300 drop-shadow-md font-light leading-relaxed line-clamp-2 max-w-xl">
-                {bannerSubtitle || 'O subtítulo aparecerá aqui preenchendo o espaço inferior do Hero Banner.'}
+              <p className="text-lg text-zinc-400 drop-shadow-xl font-medium leading-relaxed line-clamp-2 max-w-2xl">
+                {bannerSubtitle || 'A narrativa principal e estratégica do seu banner preencherá este espaço com elegância e sofisticação.'}
               </p>
-              <div className="flex items-center gap-3 pt-2">
-                <Button size="lg" className="bg-white text-black font-semibold px-6 flex items-center gap-2 rounded shadow-lg pointer-events-none py-2 h-10">
-                  <Play className="h-4 w-4 fill-current" />
-                  {bannerButton || 'Assistir Agora'}
+              <div className="flex items-center gap-4 pt-4">
+                <Button size="lg" className="bg-white text-black font-bold px-8 flex items-center gap-3 rounded-full shadow-[0_0_30px_rgba(255,255,255,0.2)] pointer-events-none py-3 h-12 text-xs tracking-widest uppercase">
+                  <Play className="h-5 w-5 fill-current" />
+                  {bannerButton || 'INICIAR CURADORIA'}
                 </Button>
-                <Button size="lg" variant="outline" className="px-6 rounded bg-zinc-600/30 border-white/20 text-white backdrop-blur-md gap-2 shadow-lg pointer-events-none py-2 h-10">
-                  <Info className="h-4 w-4" />
-                  Mais informações
+                <Button size="lg" variant="outline" className="px-8 rounded-full bg-white/5 border-white/10 text-white backdrop-blur-3xl gap-3 shadow-xl pointer-events-none py-3 h-12 text-xs tracking-widest uppercase hover:bg-white/10 transition-all font-bold">
+                  <Info className="h-5 w-5" />
+                  DETALHES DA EXPERIÊNCIA
                 </Button>
               </div>
             </div>
           </div>
 
-          <div className="space-y-4 -mt-10 relative z-20 pb-16">
+          <div className="space-y-12 -mt-20 relative z-20 pb-24 px-12">
             {sections.map(section => {
                if (!section.active) return null;
                
                let displayItems = mockModules.length > 0 ? mockModules : [];
 
                return (
-                 <div key={section.id} className="space-y-3 pt-4 pointer-events-none">
-                   <h3 className="text-lg font-semibold px-8 text-zinc-100">{section.label}</h3>
-                   <div className="flex gap-4 px-8 overflow-hidden">
+                 <div key={section.id} className="space-y-6 pointer-events-none">
+                   <div className="flex items-center gap-3">
+                      <div className="h-1 w-8 bg-primary rounded-full" />
+                      <h3 className="text-xs font-bold uppercase tracking-[0.4em] text-zinc-500">{section.label}</h3>
+                   </div>
+                   <div className="flex gap-6 overflow-hidden">
                      {displayItems.map((c: any, i: number) => (
-                       <Card key={i} className="w-[260px] h-[146px] overflow-hidden relative border-white/5 bg-black/50 shrink-0 shadow-lg">
-                         <img src={c.image} alt={c.title} className="absolute inset-0 w-full h-full object-cover opacity-60" />
-                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                         <CardContent className="absolute inset-0 p-3 flex flex-col justify-end">
-                           <h4 className="font-medium text-white text-sm line-clamp-2 leading-tight mb-2">{c.title}</h4>
+                       <Card key={i} className="w-[320px] h-[180px] overflow-hidden relative border-white/5 bg-[#0a0f0d] shrink-0 shadow-2xl rounded-2xl group/card">
+                         <img src={c.image} alt={c.title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover/card:scale-105 transition-transform duration-700" />
+                         <div className="absolute inset-0 bg-gradient-to-t from-[#050806] via-transparent to-transparent opacity-80" />
+                         <div className="absolute top-3 right-3">
+                            <Badge className="bg-primary/20 border-primary/30 text-primary text-[8px] font-black tracking-widest h-5 px-2">SBH+</Badge>
+                         </div>
+                         <CardContent className="absolute inset-0 p-6 flex flex-col justify-end">
+                           <h4 className="font-heading font-bold text-white text-sm line-clamp-2 leading-tight uppercase tracking-tight mb-2">{c.title}</h4>
+                           <div className="h-1 w-full bg-white/5 rounded-full mt-2 overflow-hidden">
+                              <div className="h-full bg-primary" style={{ width: `${c.progress}%` }} />
+                           </div>
                          </CardContent>
                        </Card>
                      ))}
@@ -329,8 +362,10 @@ export default function AdminExperiencePage() {
             })}
             
             {sections.filter(s => s.active).length === 0 && (
-              <div className="px-8 text-zinc-500 italic mt-12 text-center text-sm">
-                Nenhuma seção ativa na home no momento. Ative as seções acima para visualizar o layout local.
+              <div className="p-20 text-center flex flex-col items-center gap-4 bg-white/[0.01] border border-dashed border-white/5 rounded-[40px] mt-20">
+                 <ToggleLeft className="h-12 w-12 text-zinc-800" />
+                 <p className="text-zinc-600 font-bold uppercase tracking-[0.3em] text-[10px]">Arquitetura Modular Inativa</p>
+                 <p className="text-zinc-700 text-xs font-medium">Habilite seções no painel lateral para popular a interface.</p>
               </div>
             )}
           </div>

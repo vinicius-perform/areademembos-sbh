@@ -85,134 +85,149 @@ export default function AdminStudents() {
   const activeUsers = users.filter((u: any) => u.approval_status !== 'pending');
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex items-center justify-between">
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-white block">Aprovações e Alunos</h2>
-          <p className="text-zinc-400 mt-2">Gerencie solicitações de acesso e alunos da sua área de membros.</p>
+          <div className="flex items-center gap-2 text-primary mb-2">
+            <Users className="h-4 w-4" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Gestão de Comunidade</span>
+          </div>
+          <h2 className="text-4xl font-heading font-bold tracking-tight text-white uppercase">Membros e Acessos</h2>
+          <p className="text-zinc-500 text-sm mt-1">Moderação de ingressos e controle de permissões premium.</p>
+        </div>
+        <div className="flex gap-3">
+           <Button variant="glass" size="sm" className="text-[10px] tracking-widest font-bold">EXPORTAR CSV</Button>
+           <Button variant="premium" size="sm" className="text-[10px] tracking-widest font-bold">CONVIDAR MÉDICO</Button>
         </div>
       </div>
 
-      {/* Tabela de Pendentes */}
+      {/* Tabela de Pendentes - Estilo Bento Card */}
       {pendingUsers.length > 0 && (
-        <Card className="bg-[#1a1405]/40 border-primary/20 backdrop-blur-md overflow-hidden">
-          <div className="p-4 border-b border-primary/10 bg-primary/5 flex items-center gap-2">
-             <Clock className="w-5 h-5 text-primary" />
-             <h3 className="font-semibold text-primary">Solicitações Pendentes ({pendingUsers.length})</h3>
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+             <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+             <h3 className="text-[11px] font-bold text-primary uppercase tracking-[0.3em]">Solicitações Aguardando Auditoria ({pendingUsers.length})</h3>
           </div>
-          <Table>
-            <TableHeader className="bg-black/20 hover:bg-transparent border-white/10">
-              <TableRow className="border-white/10 hover:bg-transparent">
-                <TableHead className="text-zinc-400">Usuário</TableHead>
-                <TableHead className="text-zinc-400">Data de Solicitação</TableHead>
-                <TableHead className="text-zinc-400 text-right">Ação</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {pendingUsers.map((user: any) => (
-                <TableRow key={user.id} className="border-white/10 hover:bg-white/5 transition-colors">
-                  <TableCell className="font-medium text-white flex items-center gap-3 py-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Users className="h-5 w-5 text-primary" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {pendingUsers.map((user: any) => (
+              <Card key={user.id} className="bg-[#1a1405]/20 border-primary/20 backdrop-blur-3xl overflow-hidden group hover:bg-[#1a1405]/30 transition-all duration-500">
+                <div className="p-6 space-y-6">
+                  <div className="flex items-center gap-4">
+                    <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-all">
+                      <Users className="h-7 w-7 text-primary" />
                     </div>
-                    <div>
-                      <p>{user.name}</p>
-                      <p className="text-xs text-zinc-500 font-normal">{user.email}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-white truncate">{user.name}</p>
+                      <p className="text-[10px] text-zinc-500 truncate font-medium uppercase tracking-widest">{user.email}</p>
                     </div>
-                  </TableCell>
-                  <TableCell className="text-zinc-300">
-                    {new Date(user.created_at).toLocaleDateString('pt-BR')}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                       <Button onClick={() => handleApprove(user.id)} className="bg-green-600/20 text-green-500 hover:bg-green-600/40 border border-green-600/30">
-                         <CheckCircle className="mr-2 h-4 w-4" /> Aprovar
-                       </Button>
-                       <Button onClick={() => handleReject(user.id)} variant="ghost" className="text-red-500 hover:text-red-400 hover:bg-red-500/10 hover:border hover:border-red-500/30">
-                         <XCircle className="mr-2 h-4 w-4" /> Rejeitar
-                       </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Card>
+                  </div>
+                  
+                  <div className="pt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
+                     <span>Solicitado em</span>
+                     <span className="text-zinc-400">{new Date(user.created_at).toLocaleDateString('pt-BR')}</span>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                     <Button onClick={() => handleApprove(user.id)} className="flex-1 h-10 bg-primary/10 text-primary hover:bg-primary text-[10px] font-bold tracking-widest uppercase border border-primary/20 hover:text-white transition-all">
+                       Aprovar
+                     </Button>
+                     <Button onClick={() => handleReject(user.id)} variant="ghost" className="h-10 px-4 text-zinc-500 hover:text-destructive hover:bg-destructive/5 text-[10px] font-bold tracking-widest uppercase">
+                       Ignorar
+                     </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
       )}
 
-      <Card className="bg-black/40 border-white/10 backdrop-blur-md overflow-hidden">
-         <div className="p-4 border-b border-white/5 bg-white/5">
-             <h3 className="font-semibold text-white">Usuários Processados (Aprovados / Rejeitados)</h3>
+      <Card className="bg-black/40 border-white/5 backdrop-blur-2xl overflow-hidden shadow-2xl">
+         <div className="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+             <h3 className="text-sm font-bold text-white uppercase tracking-widest">Base Geral de Membros</h3>
+             <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                   <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                   <span className="text-[9px] font-bold text-zinc-500 uppercase">Admin</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                   <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                   <span className="text-[9px] font-bold text-zinc-500 uppercase">Médico</span>
+                </div>
+             </div>
          </div>
         <Table>
-          <TableHeader className="bg-black/20 hover:bg-transparent border-white/10">
-            <TableRow className="border-white/10 hover:bg-transparent">
-              <TableHead className="text-zinc-400">Usuário</TableHead>
-              <TableHead className="text-zinc-400">Cargo</TableHead>
-              <TableHead className="text-zinc-400">Plano do Aluno</TableHead>
-              <TableHead className="text-zinc-400">Status</TableHead>
-              <TableHead className="text-zinc-400 text-right">Ação</TableHead>
+          <TableHeader className="bg-black/40 border-white/5">
+            <TableRow className="border-white/5 hover:bg-transparent">
+              <TableHead className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest py-5 px-6">Identificação</TableHead>
+              <TableHead className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest py-5">Nível de Acesso</TableHead>
+              <TableHead className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest py-5">Modalidade</TableHead>
+              <TableHead className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest py-5">Status CRM</TableHead>
+              <TableHead className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest py-5 text-right px-6">Gestão</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-               <TableRow className="border-white/10 hover:bg-transparent">
-                  <TableCell colSpan={3} className="h-32 text-center text-zinc-500">
-                     Aguarde, carregando...
+               <TableRow className="border-white/5 hover:bg-transparent">
+                  <TableCell colSpan={5} className="h-40 text-center text-zinc-700">
+                     <Clock className="h-6 w-6 animate-spin mx-auto mb-3 opacity-20" />
+                     <span className="text-[10px] font-bold uppercase tracking-widest">Consultando base de dados...</span>
                   </TableCell>
                </TableRow>
             ) : (!activeUsers || activeUsers.length === 0) ? (
-              <TableRow className="border-white/10 hover:bg-transparent">
-                <TableCell colSpan={3} className="h-32 text-center text-zinc-500">
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <AlertCircle className="h-6 w-6 opacity-50" />
-                    <p>Nenhum usuário processado ainda.</p>
-                  </div>
+              <TableRow className="border-white/5 hover:bg-transparent">
+                <TableCell colSpan={5} className="h-40 text-center text-zinc-700">
+                   <AlertCircle className="h-6 w-6 mx-auto mb-3 opacity-20" />
+                   <span className="text-[10px] font-bold uppercase tracking-widest">Nenhum registro validado encontrado</span>
                 </TableCell>
               </TableRow>
             ) : (
               activeUsers.map((user: any) => (
-                <TableRow key={user.id} className="border-white/10 hover:bg-white/5 transition-colors">
-                  <TableCell className="font-medium text-white flex items-center gap-3 py-4">
-                    <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">
-                      <Users className="h-5 w-5 text-zinc-400" />
+                <TableRow key={user.id} className="border-white/5 hover:bg-white/[0.01] transition-colors group">
+                  <TableCell className="py-5 px-6">
+                    <div className="flex items-center gap-4">
+                      <div className="h-11 w-11 rounded-full bg-gradient-to-br from-white/5 to-transparent flex items-center justify-center border border-white/5 group-hover:border-primary/20 transition-all">
+                        <Users className="h-5 w-5 text-zinc-600 group-hover:text-primary transition-colors" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-white group-hover:text-primary transition-colors">{user.name}</p>
+                        <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-tight">{user.email}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p>{user.name}</p>
-                      <p className="text-xs text-zinc-500 font-normal">{user.email}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant="outline" 
-                      className={user.role === 'admin' ? 'border-primary/50 text-primary bg-primary/10 font-bold' : 'border-blue-400/30 text-blue-300 bg-blue-500/10'}
-                    >
-                      {user.role === 'admin' ? (
-                        <span className="flex items-center gap-1"><ShieldAlert className="h-3 w-3" /> Administrador</span>
-                      ) : (
-                        <span className="flex items-center gap-1"><GraduationCap className="h-3 w-3" /> Aluno</span>
-                      )}
-                    </Badge>
                   </TableCell>
                   <TableCell>
                     {user.role === 'admin' ? (
-                       <span className="text-zinc-600 text-xs italic">-</span>
-                    ) : user.plan_type === 'premium' ? (
-                       <Badge variant="outline" className="border-amber-500/50 text-amber-500 bg-amber-500/10 font-bold"><span className="flex items-center gap-1">👑 Premium</span></Badge>
+                       <Badge variant="premium" className="h-5 px-2 text-[8px] tracking-[0.2em] bg-primary/20 border-primary/30">ADMIN</Badge>
                     ) : (
-                       <Badge variant="outline" className="border-zinc-500/30 text-zinc-400 bg-zinc-800/30">Comum</Badge>
+                       <Badge variant="outline" className="h-5 px-2 text-[8px] tracking-[0.2em] border-blue-500/30 text-blue-400 bg-blue-500/5">MÉDICO</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {user.role === 'admin' ? (
+                       <span className="text-[10px] font-bold text-zinc-800 tracking-widest italic">SISTEMA</span>
+                    ) : user.plan_type === 'premium' ? (
+                       <Badge variant="premium" className="h-5 px-2 text-[8px] tracking-[0.2em]">PREMIUM</Badge>
+                    ) : (
+                       <Badge variant="outline" className="h-5 px-2 text-[8px] tracking-[0.2em] border-zinc-700 text-zinc-500">ESSENTIAL</Badge>
                     )}
                   </TableCell>
                   <TableCell>
                      {user.approval_status === 'approved' ? (
-                        <Badge variant="outline" className="border-green-500/50 text-green-500 bg-green-500/10">Aprovado</Badge>
+                        <div className="flex items-center gap-2">
+                           <div className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+                           <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Validado</span>
+                        </div>
                      ) : (
-                        <Badge variant="outline" className="border-red-500/50 text-red-500 bg-red-500/10">Rejeitado</Badge>
+                        <div className="flex items-center gap-2">
+                           <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                           <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Restrito</span>
+                        </div>
                      )}
                   </TableCell>
-                  <TableCell className="text-right">
-                     <Button onClick={() => openEditModal(user)} variant="ghost" size="sm" className="text-zinc-400 hover:text-white border border-white/5 hover:border-white/10 bg-black/20 hover:bg-white/10">
-                        Editar
+                  <TableCell className="text-right px-6">
+                     <Button onClick={() => openEditModal(user)} variant="glass" size="sm" className="h-9 px-4 text-[9px] font-bold tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                        Configurar
                      </Button>
                   </TableCell>
                 </TableRow>
@@ -224,81 +239,90 @@ export default function AdminStudents() {
 
       {/* Modal de Edição */}
       <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
-        <DialogContent className="sm:max-w-[425px] border-white/10 bg-[#050806]/95 backdrop-blur-3xl text-white shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl">Editar Usuário</DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Gerencie as permissões e dados básicos deste usuário.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[480px] border-white/5 bg-[#0a0f0d]/98 backdrop-blur-3xl text-white shadow-[0_0_50px_rgba(0,0,0,0.5)] p-0 overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
           
-          {editingUser && (
-            <div className="grid gap-6 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-zinc-300">Nome Completo</Label>
-                <Input 
-                  id="name" 
-                  value={editName} 
-                  onChange={(e) => setEditName(e.target.value)} 
-                  disabled={isSaving}
-                  className="bg-black/40 border-white/10 focus-visible:ring-primary/50 text-white placeholder:text-zinc-600 h-10"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="status" className="text-zinc-300">Status de Aprovação</Label>
-                <select 
-                  id="status" 
-                  value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value)}
-                  disabled={isSaving || editingUser.role === 'admin'}
-                  className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
-                >
-                  <option value="pending" className="bg-zinc-900">Pendente</option>
-                  <option value="approved" className="bg-zinc-900">Aprovado</option>
-                  <option value="rejected" className="bg-zinc-900">Rejeitado</option>
-                </select>
-              </div>
-
-              {editingUser.role !== 'admin' && (
-                <div className="space-y-2">
-                  <Label htmlFor="plan" className="text-zinc-300">Plano do Aluno</Label>
-                  <div className="p-3 border border-white/5 bg-black/20 rounded-xl space-y-3">
-                     <label className="flex items-center gap-3 cursor-pointer group">
-                        <input 
-                          type="radio" 
-                          name="plan_type" 
-                          value="basic" 
-                          checked={editPlan === 'basic' || !editPlan} 
-                          onChange={(e) => setEditPlan(e.target.value)}
-                          className="w-4 h-4 text-primary focus:ring-primary/50 bg-black/40 border-white/20"
-                        />
-                        <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors">Aluno Comum (Básico)</span>
-                     </label>
-                     <label className="flex items-center gap-3 cursor-pointer group">
-                        <input 
-                          type="radio" 
-                          name="plan_type" 
-                          value="premium" 
-                          checked={editPlan === 'premium'} 
-                          onChange={(e) => setEditPlan(e.target.value)}
-                          className="w-4 h-4 text-amber-500 focus:ring-amber-500/50 bg-black/40 border-white/20"
-                        />
-                        <span className="text-sm font-bold text-amber-500 group-hover:text-amber-400 transition-colors flex items-center gap-1">👑 Aluno Premium</span>
-                     </label>
-                  </div>
-                  <p className="text-xs text-zinc-500 mt-1">Alunos Premium ultrapassam os bloqueios de data configurados nas aulas.</p>
+          <div className="p-8 space-y-8">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-heading font-bold uppercase tracking-tight">Perfis de Membro</DialogTitle>
+              <DialogDescription className="text-zinc-500 text-xs font-medium uppercase tracking-[0.2em]">
+                Controle de governança e permissões de acesso.
+              </DialogDescription>
+            </DialogHeader>
+            
+            {editingUser && (
+              <div className="space-y-8">
+                <div className="space-y-3">
+                  <Label htmlFor="name" className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">Identidade Nominal</Label>
+                  <Input 
+                    id="name" 
+                    value={editName} 
+                    onChange={(e) => setEditName(e.target.value)} 
+                    disabled={isSaving}
+                    className="bg-white/[0.03] border-white/10 focus-visible:ring-primary/40 text-sm h-12 uppercase tracking-wide font-medium"
+                  />
                 </div>
-              )}
-            </div>
-          )}
 
-          <DialogFooter>
-             <Button variant="ghost" onClick={() => setEditingUser(null)} disabled={isSaving} className="text-zinc-400 hover:text-white">Cancelar</Button>
-             <Button onClick={handleSaveEdit} disabled={isSaving} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
-               {isSaving ? "Salvando..." : "Salvar Alterações"}
-             </Button>
-          </DialogFooter>
+                <div className="grid grid-cols-2 gap-6">
+                   <div className="space-y-3">
+                     <Label htmlFor="status" className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">Auditoria</Label>
+                     <select 
+                       id="status" 
+                       value={editStatus}
+                       onChange={(e) => setEditStatus(e.target.value)}
+                       disabled={isSaving || editingUser.role === 'admin'}
+                       className="w-full h-12 rounded-xl border border-white/10 bg-white/[0.03] px-4 text-xs font-bold uppercase tracking-widest text-white focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-30 transition-all"
+                     >
+                       <option value="pending" className="bg-[#0a0f0d]">Pendente</option>
+                       <option value="approved" className="bg-[#0a0f0d]">Aprovado</option>
+                       <option value="rejected" className="bg-[#0a0f0d]">Rejeitado</option>
+                     </select>
+                   </div>
+                   
+                   <div className="space-y-3">
+                     <Label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">Tier do Membro</Label>
+                     <div className="flex gap-2">
+                        <button 
+                          onClick={() => setEditPlan('basic')}
+                          disabled={isSaving || editingUser.role === 'admin'}
+                          className={`flex-1 h-12 rounded-xl border transition-all text-[9px] font-bold tracking-widest uppercase ${editPlan === 'basic' ? 'bg-zinc-800 border-zinc-600 text-white' : 'bg-white/[0.02] border-white/5 text-zinc-600 hover:text-zinc-400'}`}
+                        >
+                           Essential
+                        </button>
+                        <button 
+                          onClick={() => setEditPlan('premium')}
+                          disabled={isSaving || editingUser.role === 'admin'}
+                          className={`flex-1 h-12 rounded-xl border transition-all text-[9px] font-bold tracking-widest uppercase ${editPlan === 'premium' ? 'bg-primary/20 border-primary/50 text-primary shadow-[0_0_15px_rgba(191,155,95,0.2)]' : 'bg-white/[0.02] border-white/5 text-zinc-600 hover:text-zinc-400'}`}
+                        >
+                           Premium
+                        </button>
+                     </div>
+                   </div>
+                </div>
+
+                {editingUser.role !== 'admin' && (
+                  <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+                     <div className="flex items-start gap-4">
+                        <div className="h-10 w-10 flex-shrink-0 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
+                           <GraduationCap className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                           <p className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-1">Acesso Estratégico</p>
+                           <p className="text-[11px] text-zinc-500 leading-relaxed font-medium">Membros com tier <span className="text-white">Premium</span> possuem bypass imediato em todos os bloqueios temporais de aula.</p>
+                        </div>
+                     </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <DialogFooter className="pt-4 flex gap-3">
+               <Button variant="ghost" onClick={() => setEditingUser(null)} disabled={isSaving} className="h-12 text-[10px] font-bold text-zinc-600 tracking-widest uppercase px-6">Cancelar</Button>
+               <Button onClick={handleSaveEdit} disabled={isSaving} variant="premium" className="h-12 text-[10px] font-bold tracking-widest uppercase flex-1 shadow-lg">
+                 {isSaving ? "PROCESSANDO..." : "VALIDAR ALTERAÇÕES"}
+               </Button>
+            </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

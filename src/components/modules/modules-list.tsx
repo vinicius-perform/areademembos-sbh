@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { GripVertical, Plus, Video, Edit2, Archive, Trash2, FolderOpen } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -109,149 +110,154 @@ export function ModulesList({ modules }: { modules: any[] }) {
     .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex items-center justify-between">
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-white block">Área de Membros <span className="text-primary">(Módulos)</span></h2>
-          <p className="text-zinc-400 mt-2">
-            Organize os módulos principais e suas respectivas aulas com facilidade.
-          </p>
+          <div className="flex items-center gap-2 text-primary mb-2">
+            <FolderOpen className="h-4 w-4" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Arquitetura de Ensino</span>
+          </div>
+          <h2 className="text-4xl font-heading font-bold tracking-tight text-white uppercase">Gestão de Conteúdo</h2>
+          <p className="text-zinc-500 text-sm mt-1">Estruturação e curadoria dos módulos SBH Premium.</p>
         </div>
         <CreateModuleDialog />
       </div>
 
       {activeModules.length === 0 ? (
-        <Card className="bg-black/40 border-white/10 backdrop-blur-md shadow-2xl">
-          <CardContent className="p-12 text-center flex flex-col items-center">
-            <FolderOpen className="w-12 h-12 text-primary/40 mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">Sua Área de Membros está vazia</h3>
-            <p className="text-zinc-500 font-medium">Cadastre seu primeiro Módulo clicando no botão acima para começar.</p>
+        <Card className="bg-black/40 border-white/5 backdrop-blur-3xl shadow-2xl">
+          <CardContent className="p-20 text-center flex flex-col items-center">
+            <div className="h-20 w-20 bg-primary/5 rounded-full flex items-center justify-center border border-primary/10 mb-6">
+               <FolderOpen className="w-10 h-10 text-primary/40" />
+            </div>
+            <h3 className="text-2xl font-heading font-medium text-white mb-2 uppercase tracking-tight">Acervo Vazio</h3>
+            <p className="text-zinc-500 max-w-sm mx-auto leading-relaxed text-sm">Inicie a construção da sua área de membros criando o primeiro módulo estratégico.</p>
           </CardContent>
         </Card>
       ) : (
-        <Card className="bg-black/40 border-white/10 backdrop-blur-md shadow-2xl">
-          <CardContent className="p-6">
-            <Accordion type="multiple" defaultValue={activeModules.map((m: any) => m.id)} className="space-y-4">
-              {activeModules.map((module: any) => (
-                <AccordionItem 
-                  key={module.id} 
-                  value={module.id}
-                  className={`border border-white/10 rounded-xl bg-black/20 overflow-hidden px-2 transition-opacity ${isArchiving === module.id ? 'opacity-50 pointer-events-none' : ''}`}
-                >
-                  <AccordionTrigger className="hover:no-underline px-4 hover:bg-white/5 rounded-lg transition-all py-4">
-                    <div className="flex items-center justify-between w-full pr-4 text-left">
-                      <div className="flex flex-row items-center gap-4">
-                        <GripVertical className="h-5 w-5 text-zinc-600 cursor-grab active:cursor-grabbing hover:text-white transition-colors" />
-                        
-                        <div className="h-14 w-10 relative flex-shrink-0 rounded-md overflow-hidden bg-black/50 border border-white/10 hidden sm:block">
-                           {module.cover_image_vertical ? (
-                              <img src={module.cover_image_vertical} alt={module.title} className="absolute inset-0 w-full h-full object-cover" />
-                           ) : (
-                              <div className="absolute inset-0 flex items-center justify-center text-primary/40"><FolderOpen className="h-4 w-4" /></div>
-                           )}
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                          <span className="font-semibold text-white text-lg block truncate">{module.title}</span>
-                          {module.description && <span className="text-sm text-zinc-500 block truncate font-normal mt-0.5">{module.description}</span>}
-                        </div>
+        <div className="space-y-6">
+          <Accordion multiple defaultValue={activeModules.map((m: any) => m.id)} className="space-y-6">
+            {activeModules.map((module: any) => (
+              <AccordionItem 
+                key={module.id} 
+                value={module.id}
+                className={`border border-white/5 rounded-2xl bg-black/40 backdrop-blur-2xl overflow-hidden transition-all duration-500 ${isArchiving === module.id ? 'opacity-50 pointer-events-none' : 'hover:border-primary/20'}`}
+              >
+                <AccordionTrigger className="hover:no-underline px-6 py-6 group">
+                  <div className="flex items-center justify-between w-full pr-4 text-left">
+                    <div className="flex flex-row items-center gap-6">
+                      <div className="h-10 w-6 flex items-center justify-center border-r border-white/5 pr-4">
+                         <GripVertical className="h-4 w-4 text-zinc-700 group-hover:text-primary transition-colors cursor-grab" />
+                      </div>
+                      
+                      <div className="h-16 w-12 relative flex-shrink-0 rounded-xl overflow-hidden bg-black/50 border border-white/5 shadow-inner">
+                         {module.cover_image_vertical ? (
+                            <img src={module.cover_image_vertical} alt={module.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                         ) : (
+                            <div className="absolute inset-0 flex items-center justify-center text-primary/20 bg-gradient-to-br from-white/5 to-transparent"><FolderOpen className="h-5 w-5" /></div>
+                         )}
                       </div>
 
-                      <div className="flex items-center gap-3 shrink-0">
-                        <Badge variant="outline" className="border-white/10 text-zinc-400 bg-black/40">
-                          {module.lessons?.length || 0} aulas
-                        </Badge>
-                        <Button onClick={(e) => handleEdit(e, module)} disabled={isArchiving === module.id} variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-white">
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Button onClick={(e) => handleArchive(e, module.id)} disabled={isArchiving === module.id} variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-destructive hover:bg-destructive/20">
-                          {isArchiving === module.id ? <Archive className="h-4 w-4 animate-spin opacity-50" /> : <Archive className="h-4 w-4" />}
-                        </Button>
-                        
-                        <Button onClick={e => handleAddLesson(e, module)} size="sm" variant="outline" className="h-8 ml-2 border-primary/50 text-primary hover:bg-primary/10 transition-colors">
-                          <Plus className="mr-1 h-3 w-3" /> Aula
-                        </Button>
+                      <div className="flex-1 min-w-0">
+                        <span className="font-heading font-bold text-white text-lg block tracking-tight uppercase group-hover:text-primary transition-colors">{module.title}</span>
+                        {module.description && <span className="text-xs text-zinc-500 block truncate font-medium mt-1 uppercase tracking-widest">{module.description}</span>}
                       </div>
                     </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="pt-2 pb-4 px-4 sm:px-16">
-                    <div className="space-y-2 mt-4">
-                      {(!module.lessons || module.lessons.length === 0) ? (
-                        <div className="p-4 rounded-lg border border-dashed border-white/10 text-zinc-500 text-sm italic text-center">Nenhuma aula cadastrada neste módulo ainda.</div>
-                      ) : (
-                        module.lessons.sort((a: any,b: any) => (a.order||0) - (b.order||0)).map((lesson: any) => (
-                          <div 
-                            key={lesson.id}
-                            className="flex items-center justify-between p-3 rounded-lg border border-white/5 bg-white/5 hover:border-white/10 hover:bg-white/10 transition-all group"
-                          >
-                            <div className="flex items-center gap-4">
-                              <GripVertical className="h-4 w-4 text-zinc-600 cursor-grab hover:text-white shrink-0" />
-                              <div className="h-8 w-8 rounded bg-primary/20 flex shrink-0 items-center justify-center">
-                                <Video className="h-4 w-4 text-primary" />
-                              </div>
-                              <div className="min-w-0 flex flex-col items-start gap-1">
-                                <p className="font-medium text-white text-sm truncate flex items-center gap-2">
-                                  {lesson.title}
-                                  {lesson.is_premium && (
-                                    <span className="inline-flex items-center gap-1 rounded bg-amber-500/20 px-2 py-0.5 text-[10px] font-semibold text-amber-500 border border-amber-500/30">
-                                      👑 {new Date() < new Date(lesson.premium_start_date || new Date()) ? `Premium após ${new Date(lesson.premium_start_date).toLocaleDateString('pt-BR')}` : 'Premium Ativo'}
-                                    </span>
-                                  )}
-                                </p>
-                                <p className="text-xs text-zinc-500 truncate">{lesson.video_url}</p>
-                              </div>
+
+                    <div className="flex items-center gap-4 shrink-0">
+                      <Badge variant="outline" className="h-7 px-3 border-white/10 text-zinc-400 bg-white/5 font-bold tracking-widest text-[9px]">
+                        {module.lessons?.length || 0} CONTEÚDOS
+                      </Badge>
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                         <Button onClick={(e) => handleEdit(e, module)} disabled={isArchiving === module.id} variant="glass" size="icon" className="h-9 w-9">
+                           <Edit2 className="h-4 w-4" />
+                         </Button>
+                         <Button onClick={(e) => handleArchive(e, module.id)} disabled={isArchiving === module.id} variant="glass" size="icon" className="h-9 w-9 text-zinc-500 hover:text-destructive">
+                           <Archive className="h-4 w-4" />
+                         </Button>
+                         <Button onClick={e => handleAddLesson(e, module)} size="sm" variant="premium" className="h-9 ml-2 text-[10px] font-bold tracking-widest">
+                           <Plus className="mr-1 h-3.5 w-3.5" /> NOVA AULA
+                         </Button>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-0 pb-6 px-10">
+                  <div className="space-y-3 mt-4 pl-12 border-l border-white/5">
+                    {(!module.lessons || module.lessons.length === 0) ? (
+                      <div className="p-8 rounded-xl border border-dashed border-white/5 bg-white/[0.01] text-zinc-600 text-[10px] font-bold uppercase tracking-[0.2em] text-center">Aguardando inserção de conteúdos pedagógicos...</div>
+                    ) : (
+                      module.lessons.sort((a: any,b: any) => (a.order||0) - (b.order||0)).map((lesson: any, i: number) => (
+                        <motion.div 
+                          key={lesson.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:border-primary/20 hover:bg-white/[0.04] transition-all group/item"
+                        >
+                          <div className="flex items-center gap-5">
+                            <span className="text-[10px] font-bold text-zinc-700 w-4">{String(i + 1).padStart(2, '0')}</span>
+                            <div className="h-10 w-10 rounded-lg bg-black/40 flex shrink-0 items-center justify-center border border-white/5 group-hover/item:border-primary/30 transition-all">
+                              <Video className="h-4 w-4 text-zinc-500 group-hover/item:text-primary transition-colors" />
                             </div>
-                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                              <Button onClick={() => handleEditLesson(lesson)} disabled={isDeletingLesson === lesson.id} variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-white/10">
-                                <Edit2 className="h-4 w-4" />
-                              </Button>
-                              <Button onClick={() => handleDeleteLesson(lesson.id)} disabled={isDeletingLesson === lesson.id} variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-destructive hover:bg-destructive/20">
-                                {isDeletingLesson === lesson.id ? <Trash2 className="h-4 w-4 animate-spin opacity-50" /> : <Trash2 className="h-4 w-4" />}
-                              </Button>
+                            <div className="min-w-0 flex flex-col items-start gap-1">
+                              <p className="font-bold text-white text-xs truncate flex items-center gap-3 tracking-wide">
+                                {lesson.title}
+                                {lesson.is_premium && (
+                                  <Badge variant="premium" className="h-4 px-2 text-[8px] tracking-[0.2em]">PREMIUM</Badge>
+                                )}
+                              </p>
+                              <p className="text-[9px] text-zinc-600 truncate font-medium uppercase tracking-widest">{lesson.video_url}</p>
                             </div>
                           </div>
-                        ))
-                      )}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </CardContent>
-        </Card>
+                          <div className="flex items-center gap-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                            <Button onClick={() => handleEditLesson(lesson)} disabled={isDeletingLesson === lesson.id} variant="ghost" size="icon" className="h-8 w-8 text-zinc-500 hover:text-white">
+                              <Edit2 className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button onClick={() => handleDeleteLesson(lesson.id)} disabled={isDeletingLesson === lesson.id} variant="ghost" size="icon" className="h-8 w-8 text-zinc-500 hover:text-destructive">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </motion.div>
+                      ))
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
       )}
 
       {archivedModules.length > 0 && (
-        <div className="space-y-4 pt-8 border-t border-white/5">
-          <div>
-             <h3 className="text-xl font-bold text-white flex items-center gap-2">
-               <Archive className="h-5 w-5 text-zinc-400" /> Módulos Arquivados
-             </h3>
-             <p className="text-zinc-500 text-sm mt-1">Módulos que não estão visíveis para os alunos. Você pode restaurá-los ou excluí-los permanentemente.</p>
+        <div className="space-y-6 pt-12 border-t border-white/5">
+          <div className="flex items-center gap-4">
+             <div className="h-10 w-10 bg-zinc-900 rounded-full flex items-center justify-center border border-white/5">
+                <Archive className="h-5 w-5 text-zinc-600" />
+             </div>
+             <div>
+                <h3 className="text-lg font-heading font-medium text-white uppercase tracking-tight">Cofre de Arquivos</h3>
+                <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Conteúdos offline ou obsoletos</p>
+             </div>
           </div>
           
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              {archivedModules.map((module: any) => (
-                <div key={module.id} className="flex items-center justify-between p-4 bg-black/40 border border-white/10 rounded-xl">
-                   <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 relative flex-shrink-0 rounded-md overflow-hidden bg-black/50 border border-white/10 grayscale opacity-50">
-                         {module.cover_image_vertical ? (
-                            <img src={module.cover_image_vertical} alt={module.title} className="absolute inset-0 w-full h-full object-cover" />
-                         ) : (
-                            <div className="absolute inset-0 flex items-center justify-center text-zinc-500"><FolderOpen className="h-4 w-4" /></div>
-                         )}
+                <div key={module.id} className="flex items-center justify-between p-5 bg-black/60 border border-white/5 rounded-2xl group/archived">
+                   <div className="flex items-center gap-5">
+                      <div className="h-12 w-10 relative flex-shrink-0 rounded-lg overflow-hidden bg-black/50 border border-white/5 grayscale opacity-30">
+                         {module.cover_image_vertical && <img src={module.cover_image_vertical} alt={module.title} className="absolute inset-0 w-full h-full object-cover" />}
                       </div>
                       <div>
-                         <span className="font-semibold text-zinc-400 block">{module.title}</span>
-                         <span className="text-xs text-zinc-500 block">{module.lessons?.length || 0} aulas arquivadas</span>
+                         <span className="font-bold text-zinc-500 block text-xs uppercase tracking-wide">{module.title}</span>
+                         <span className="text-[9px] text-zinc-700 block font-bold uppercase tracking-[0.2em] mt-1">{module.lessons?.length || 0} Conteúdos</span>
                       </div>
                    </div>
                    <div className="flex items-center gap-2">
-                      <Button onClick={(e) => handleRestore(e, module.id)} variant="outline" size="sm" className="h-8 border-white/10 text-zinc-300 hover:text-white bg-black/50">
+                      <Button onClick={(e) => handleRestore(e, module.id)} variant="glass" size="sm" className="h-9 px-4 text-[9px] font-bold tracking-widest uppercase">
                          Restaurar
                       </Button>
-                      <Button onClick={(e) => handleDeleteModule(e, module.id)} disabled={isDeletingModule === module.id} variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-destructive hover:bg-destructive/20" title="Excluir Permanentemente">
-                         {isDeletingModule === module.id ? <Trash2 className="h-4 w-4 animate-spin opacity-50" /> : <Trash2 className="h-4 w-4" />}
+                      <Button onClick={(e) => handleDeleteModule(e, module.id)} disabled={isDeletingModule === module.id} variant="ghost" size="icon" className="h-9 w-9 text-zinc-700 hover:text-destructive" title="Excluir Permanentemente">
+                         {isDeletingModule === module.id ? <Trash2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                       </Button>
                    </div>
                 </div>
