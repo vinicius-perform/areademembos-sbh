@@ -68,9 +68,8 @@ export default function StudentHomeClient({ config, modulesToUse }: { config: an
   };
 
   const sections = config?.sections || [
-    { id: 'continue_watching', label: 'Continue assistindo', active: true },
     { id: 'highlight_modules', label: 'Módulos em Destaque', active: true },
-    { id: 'recent_lessons', label: 'Destaques Premium', active: true },
+    { id: 'recent_lessons', label: 'Módulos de Especialização', active: true },
   ];
 
   const ctaLinkId = modulesToUse?.length > 0 ? modulesToUse[0].id : '';
@@ -109,7 +108,7 @@ export default function StudentHomeClient({ config, modulesToUse }: { config: an
           >
             <div className="flex flex-col items-center gap-4">
               <Badge variant="premium" className="px-5 py-1 text-[10px] tracking-[0.5em] font-black uppercase ring-1 ring-primary/50 shadow-[0_0_20px_rgba(191,155,95,0.3)]">
-                 CURADORIA SBH
+                 ÁREA DE MEMBROS
               </Badge>
               <div className="h-12 w-[1px] bg-gradient-to-b from-primary/60 to-transparent" />
             </div>
@@ -126,20 +125,7 @@ export default function StudentHomeClient({ config, modulesToUse }: { config: an
                {banner.subtitle}
             </p>
             
-            <div className="flex flex-wrap items-center justify-center gap-6 pt-6">
-              {ctaLinkId && (
-                <Link href={`/app/module/${ctaLinkId}/lesson/first`}>
-                  <Button variant="premium" className="h-16 px-12 text-[11px] font-black tracking-[0.3em] gap-4 rounded-full shadow-[0_0_50px_rgba(191,155,95,0.2)] hover:shadow-[0_0_70px_rgba(191,155,95,0.4)] transition-all duration-700">
-                    <Play className="h-5 w-5 fill-current" />
-                    {banner.buttonText}
-                  </Button>
-                </Link>
-              )}
-              <Button variant="glass" className="h-16 px-12 text-[11px] font-black tracking-[0.3em] gap-4 rounded-full bg-white/5 border-white/10 hover:bg-white/10 transition-all duration-700">
-                <Info className="h-5 w-5" />
-                EXPLORAR ACERVO
-              </Button>
-            </div>
+
           </motion.div>
         </div>
 
@@ -150,46 +136,7 @@ export default function StudentHomeClient({ config, modulesToUse }: { config: an
       </div>
 
       {/* Content Sections */}
-      <div className="relative z-20 pb-40 space-y-10">
-        {/* Continue Watching Mini Carousel */}
-        <div className="px-8 md:px-16 -mt-32">
-           <motion.div 
-             initial={{ opacity: 0, y: 30 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true }}
-             className="bg-black/40 backdrop-blur-3xl border border-white/5 p-8 md:p-14 rounded-[40px] shadow-[0_0_80px_rgba(0,0,0,0.5)] flex flex-col md:flex-row items-center gap-12 relative overflow-hidden group"
-           >
-              {/* Internal Accent */}
-              <div className="absolute top-0 left-0 w-2 h-full bg-primary/40 group-hover:bg-primary transition-colors duration-700" />
-              
-              <div className="flex-1 space-y-6">
-                 <div className="flex items-center gap-3 text-primary">
-                   <div className="h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(191,155,95,0.8)]" />
-                   <span className="text-[10px] font-black uppercase tracking-[0.4em]">RESGATE DE TRANSMISSÃO</span>
-                 </div>
-                 <h2 className="text-4xl font-heading font-medium text-white tracking-tight leading-none uppercase">Anatomia Estrutural: <span className="text-zinc-500 italic">Módulo 04</span></h2>
-                 <div className="space-y-3">
-                    <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden shadow-inner">
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        whileInView={{ width: "65%" }}
-                        transition={{ duration: 1.5, ease: "easeInOut" }}
-                        className="h-full bg-gradient-to-r from-primary/50 to-primary shadow-[0_0_15px_rgba(191,155,95,0.4)]" 
-                      />
-                    </div>
-                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-600">
-                       <span>Progresso Realizado</span>
-                       <span className="text-zinc-400">65% • Aula 12 de 18</span>
-                    </div>
-                 </div>
-              </div>
-              <Button variant="premium" className="rounded-full h-20 w-20 p-0 shadow-[0_0_30px_rgba(191,155,95,0.3)] hover:scale-105 transition-all duration-500 overflow-hidden relative group/btn">
-                 <div className="absolute inset-0 bg-white/20 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-                 <Play className="h-8 w-8 ml-1 fill-current relative z-10" />
-              </Button>
-           </motion.div>
-        </div>
-
+      <div className="relative z-20 pb-40 space-y-10 -mt-24">
         {sections.map((section: any) => {
            if (!section.active) return null;
            const sModules = modulesToUse || [];

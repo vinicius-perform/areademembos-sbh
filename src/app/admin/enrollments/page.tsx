@@ -5,6 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
+import { EnrollmentActionsClient } from '@/components/admin/enrollment-actions-client';
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -85,14 +87,14 @@ export default async function AdminEnrollments() {
                     </span>
                   </TableCell>
                   <TableCell className="text-right px-6">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
-                      <Button variant="glass" size="icon" className="h-9 w-9 text-zinc-500 hover:text-white" title="Editar Progresso/Plano">
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button variant="glass" size="icon" className="h-9 w-9 text-zinc-500 hover:text-destructive" title="Revogar Matrícula">
-                        <Unlink className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <EnrollmentActionsClient 
+                      user={{ 
+                        id: user.id, 
+                        name: user.name, 
+                        email: user.email, 
+                        plan_type: user.plan_type 
+                      }} 
+                    />
                   </TableCell>
                 </TableRow>
               ))
