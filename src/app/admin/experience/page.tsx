@@ -307,54 +307,64 @@ export default function AdminExperiencePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-[#050806] via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 w-full h-[50%] bg-gradient-to-t from-[#050806] to-transparent pointer-events-none" />
             
-            <div className="relative z-10 px-12 max-w-4xl space-y-6">
-              <Badge variant="premium" className="h-6 px-3 text-[9px] tracking-[0.4em] mb-2 font-black">CURADORIA SBH</Badge>
-              <h1 className="text-5xl md:text-7xl font-heading font-bold tracking-tight text-white drop-shadow-2xl leading-[1.05] uppercase">
-                {bannerTitle || 'CURSO DE IMPACTO'}
-              </h1>
-              <p className="text-lg text-zinc-400 drop-shadow-xl font-medium leading-relaxed line-clamp-2 max-w-2xl">
-                {bannerSubtitle || 'A narrativa principal e estratégica do seu banner preencherá este espaço com elegância e sofisticação.'}
-              </p>
-              <div className="flex items-center gap-4 pt-4">
-                <Button size="lg" className="bg-white text-black font-bold px-8 flex items-center gap-3 rounded-full shadow-[0_0_30px_rgba(255,255,255,0.2)] pointer-events-none py-3 h-12 text-xs tracking-widest uppercase">
-                  <Play className="h-5 w-5 fill-current" />
-                  {bannerButton || 'INICIAR CURADORIA'}
-                </Button>
-                <Button size="lg" variant="outline" className="px-8 rounded-full bg-white/5 border-white/10 text-white backdrop-blur-3xl gap-3 shadow-xl pointer-events-none py-3 h-12 text-xs tracking-widest uppercase hover:bg-white/10 transition-all font-bold">
-                  <Info className="h-5 w-5" />
-                  DETALHES DA EXPERIÊNCIA
-                </Button>
+            <div className="relative z-10 px-8 md:px-16 w-full flex flex-col items-center text-center">
+              <div className="space-y-10">
+                <div className="flex flex-col items-center gap-4">
+                  <Badge variant="premium" className="px-5 py-1 text-[10px] tracking-[0.5em] font-black uppercase ring-1 ring-primary/50 shadow-[0_0_20px_rgba(191,155,95,0.3)]">
+                    ÁREA DE MEMBROS
+                  </Badge>
+                  <div className="h-12 w-[1px] bg-gradient-to-b from-primary/60 to-transparent" />
+                </div>
+                
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-white leading-[1.1] tracking-tighter uppercase drop-shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                  {(bannerTitle || 'CURSO DE IMPACTO').split(' ').map((word: string, i: number) => (
+                    <span key={i} className={i % 2 === 0 ? "block" : "block text-transparent bg-clip-text bg-gradient-to-b from-primary to-[#F5E6CA] opacity-90"}>
+                      {word}
+                    </span>
+                  ))}
+                </h1>
+                
+                <p className="text-base md:text-lg text-zinc-400 drop-shadow-md font-medium leading-relaxed max-w-2xl mx-auto italic opacity-80 backdrop-blur-[1px]">
+                  {bannerSubtitle || 'A narrativa principal e estratégica do seu banner preencherá este espaço com elegância e sofisticação.'}
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="space-y-12 -mt-20 relative z-20 pb-24 px-12">
+          <div className="relative z-20 pb-24 space-y-10 -mt-24">
             {sections.map(section => {
                if (!section.active) return null;
                
                let displayItems = mockModules.length > 0 ? mockModules : [];
 
                return (
-                 <div key={section.id} className="space-y-6 pointer-events-none">
-                   <div className="flex items-center gap-3">
-                      <div className="h-1 w-8 bg-primary rounded-full" />
-                      <h3 className="text-xs font-bold uppercase tracking-[0.4em] text-zinc-500">{section.label}</h3>
+                 <div key={section.id} className="space-y-6 pt-12">
+                   <div className="flex items-center justify-between px-8 md:px-16">
+                     <h3 className="text-2xl font-heading font-medium tracking-tight text-[#F5E6CA]">{section.label}</h3>
                    </div>
-                   <div className="flex gap-6 overflow-hidden">
-                     {displayItems.map((c: any, i: number) => (
-                       <Card key={i} className="w-[320px] h-[180px] overflow-hidden relative border-white/5 bg-[#0a0f0d] shrink-0 shadow-2xl rounded-2xl group/card">
-                         <img src={c.image} alt={c.title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover/card:scale-105 transition-transform duration-700" />
-                         <div className="absolute inset-0 bg-gradient-to-t from-[#050806] via-transparent to-transparent opacity-80" />
-                         <div className="absolute top-3 right-3">
-                            <Badge className="bg-primary/20 border-primary/30 text-primary text-[8px] font-black tracking-widest h-5 px-2">SBH+</Badge>
-                         </div>
-                         <CardContent className="absolute inset-0 p-6 flex flex-col justify-end">
-                           <h4 className="font-heading font-bold text-white text-sm line-clamp-2 leading-tight uppercase tracking-tight mb-2">{c.title}</h4>
-                           <div className="h-1 w-full bg-white/5 rounded-full mt-2 overflow-hidden">
-                              <div className="h-full bg-primary" style={{ width: `${c.progress}%` }} />
+                   <div className="flex gap-6 px-8 md:px-16 overflow-x-auto pb-10 snap-x style-scrollbar-hide">
+                     {displayItems.map((module: any, i: number) => (
+                       <div key={module.id} className="snap-start shrink-0">
+                         <div className="w-[340px] h-[200px] overflow-hidden group/card relative border-white/5 bg-black/60 shadow-2xl rounded-2xl">
+                           <img 
+                             src={module.image || 'https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=800&q=80'} 
+                             alt={module.title}
+                             className="absolute inset-0 w-full h-full object-cover opacity-70 transition-all duration-700"
+                           />
+                           <div className="absolute inset-0 bg-gradient-to-t from-[#050806] via-transparent to-transparent opacity-90" />
+                           
+                           <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                             <div className="flex items-center gap-2 mb-2">
+                               <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-primary/40 bg-primary/10 text-primary px-2 py-0">
+                                 Médico
+                               </Badge>
+                             </div>
+                             <h4 className="font-heading font-medium text-lg text-white line-clamp-2 leading-tight drop-shadow-lg">
+                               {module.title}
+                             </h4>
                            </div>
-                         </CardContent>
-                       </Card>
+                         </div>
+                       </div>
                      ))}
                    </div>
                  </div>
