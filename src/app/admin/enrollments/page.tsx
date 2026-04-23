@@ -1,4 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
 import { BookOpenCheck, Edit2, Link as LinkIcon, Unlink, AlertCircle, Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,9 +9,7 @@ import { EnrollmentActionsClient } from '@/components/admin/enrollment-actions-c
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from '@/lib/supabase';
 
 export default async function AdminEnrollments() {
   const { data: users } = await supabase
