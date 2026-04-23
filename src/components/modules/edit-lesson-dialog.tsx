@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Calendar, FileText, Plus, Trash2, Loader2, Paperclip } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface EditLessonDialogProps {
@@ -22,8 +22,11 @@ export function EditLessonDialog({ lesson, open, onOpenChange }: EditLessonDialo
   const [videoUrl, setVideoUrl] = useState('');
   const [isPremium, setIsPremium] = useState(false);
   const [premiumStartDate, setPremiumStartDate] = useState('');
+  const [releaseDate, setReleaseDate] = useState('');
+  const [attachments, setAttachments] = useState<any[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [errorMSG, setErrorMSG] = useState<string | null>(null);
   const [successMSG, setSuccessMSG] = useState<string | null>(null);
 
@@ -33,6 +36,8 @@ export function EditLessonDialog({ lesson, open, onOpenChange }: EditLessonDialo
       setVideoUrl(lesson.video_url || '');
       setIsPremium(lesson.is_premium || false);
       setPremiumStartDate(lesson.premium_start_date ? lesson.premium_start_date.split('T')[0] : '');
+      setReleaseDate(lesson.release_date ? lesson.release_date.split('T')[0] : '');
+      setAttachments(lesson.attachments || []);
       setErrorMSG(null);
       setSuccessMSG(null);
     }
@@ -69,7 +74,9 @@ export function EditLessonDialog({ lesson, open, onOpenChange }: EditLessonDialo
         title,
         video_url: videoUrl,
         is_premium: isPremium,
-        premium_start_date: isPremium ? (premiumStartDate ? new Date(premiumStartDate + 'T00:00:00').toISOString() : null) : null
+        premium_start_date: isPremium ? (premiumStartDate ? new Date(premiumStartDate + 'T00:00:00').toISOString() : null) : null,
+        release_date: releaseDate ? new Date(releaseDate + 'T00:00:00').toISOString() : null,
+        attachments: attachments
       }).eq('id', lesson.id);
 
       if (error) throw new Error(`Erro ao salvar aula: ${error.message}`);
@@ -137,6 +144,19 @@ export function EditLessonDialog({ lesson, open, onOpenChange }: EditLessonDialo
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="release_date" className="text-zinc-300">Data de Estreia</Label>
+            <Input 
+              id="release_date" 
+              type="date"
+              value={releaseDate}
+              onChange={(e) => setReleaseDate(e.target.value)}
+              disabled={isLoading || !!successMSG}
+              className="bg-black/40 border-white/10 focus-visible:ring-primary/50 text-white placeholder:text-zinc-600 h-10 w-full [&::-webkit-calendar-picker-indicator]:[filter:invert(65%)_sepia(85%)_saturate(400%)_hue-rotate(10deg)] cursor-pointer" 
+            />
+            <p className="text-xs text-zinc-500">Data em que a aula ficará visível para os alunos.</p>
+          </div>
+
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <input 
@@ -157,17 +177,93 @@ export function EditLessonDialog({ lesson, open, onOpenChange }: EditLessonDialo
             {isPremium && (
               <div className="space-y-2 mt-4 pl-8 border-l-2 border-primary/30 py-1">
                 <Label htmlFor="premium_start_date" className="text-zinc-300 text-sm">Data de ativação do Premium <span className="text-red-500">*</span></Label>
-                <Input 
-                  id="premium_start_date" 
-                  type="date"
-                  value={premiumStartDate}
-                  onChange={(e) => setPremiumStartDate(e.target.value)}
-                  disabled={isLoading || !!successMSG}
-                  className="bg-black/40 border-white/10 focus-visible:ring-primary/50 text-white placeholder:text-zinc-600 h-10 w-full" 
-                />
+                <div className="relative">
+                  <Input 
+                    id="premium_start_date" 
+                    type="date"
+                    value={premiumStartDate}
+                    onChange={(e) => setPremiumStartDate(e.target.value)}
+                    disabled={isLoading || !!successMSG}
+                    className="bg-black/40 border-white/10 focus-visible:ring-primary/50 text-white placeholder:text-zinc-600 h-10 w-full [&::-webkit-calendar-picker-indicator]:[filter:invert(65%)_sepia(85%)_saturate(400%)_hue-rotate(10deg)] cursor-pointer" 
+                  />
+                </div>
                 <p className="text-xs text-zinc-500">A partir desta data, a aula será restrita a usuários pagantes.</p>
               </div>
             )}
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-zinc-300">Materiais Complementares</Label>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                disabled={isUploading || isLoading || !!successMSG}
+                className="h-8 border-primary/30 text-primary hover:bg-primary/10 gap-2"
+                onClick={() => document.getElementById('file-upload')?.click()}
+              >
+                {isUploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+                Adicionar Arquivo
+              </Button>
+              <input 
+                id="file-upload" 
+                type="file" 
+                className="hidden" 
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  
+                  setIsUploading(true);
+                  try {
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+                    const filePath = `materials/${fileName}`;
+
+                    const { error: uploadError } = await supabase.storage
+                      .from('courses')
+                      .upload(filePath, file);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: { publicUrl } } = supabase.storage
+                      .from('courses')
+                      .getPublicUrl(filePath);
+
+                    setAttachments([...attachments, { name: file.name, url: publicUrl, size: file.size }]);
+                  } catch (err: any) {
+                    setErrorMSG(`Erro no upload: ${err.message}`);
+                  } finally {
+                    setIsUploading(false);
+                    e.target.value = '';
+                  }
+                }} 
+              />
+            </div>
+
+            <div className="space-y-2 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar">
+              {attachments.length === 0 ? (
+                <p className="text-xs text-zinc-600 italic text-center py-4 border border-dashed border-white/5 rounded-lg">
+                  Nenhum material adicionado.
+                </p>
+              ) : (
+                attachments.map((file, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10 group">
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <FileText className="h-4 w-4 text-primary shrink-0" />
+                      <span className="text-sm text-zinc-300 truncate">{file.name}</span>
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => setAttachments(attachments.filter((_, i) => i !== index))}
+                      className="text-zinc-500 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
         

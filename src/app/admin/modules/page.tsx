@@ -21,6 +21,8 @@ export default async function AdminModulesPage() {
         video_url,
         is_premium,
         premium_start_date,
+        release_date,
+        attachments,
         "order"
       )
     `)
