@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, CheckCircle2, Calendar, FileText, Plus, Trash2, Loader2, Paperclip } from 'lucide-react';
+import { AlertCircle, CheckCircle2, FileText, Plus, Trash2, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface EditLessonDialogProps {
