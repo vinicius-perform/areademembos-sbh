@@ -29,6 +29,7 @@ interface EnrollmentActionsClientProps {
     name: string
     email: string
     plan_type: string
+    password?: string
   }
 }
 
@@ -40,7 +41,8 @@ export function EnrollmentActionsClient({ user }: EnrollmentActionsClientProps) 
   // States for Edit Form
   const [formData, setFormData] = useState({
     name: user.name,
-    plan_type: user.plan_type as 'basic' | 'premium'
+    plan_type: user.plan_type as 'basic' | 'premium',
+    password: user.password || ''
   })
 
   const handleUpdate = async () => {
@@ -94,6 +96,18 @@ export function EnrollmentActionsClient({ user }: EnrollmentActionsClientProps) 
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="bg-zinc-900/50 border-white/5 focus:border-primary/50"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Senha de Acesso</Label>
+              <Input 
+                id="password" 
+                value={formData.password} 
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Defina uma nova senha..."
+                className="bg-zinc-900/50 border-white/5 focus:border-primary/50 text-primary font-mono"
+              />
+              <p className="text-[9px] text-zinc-600 uppercase tracking-tight">Cuidado: Alterar este campo mudará a senha de login do aluno imediatamente.</p>
             </div>
             
             <div className="space-y-2">

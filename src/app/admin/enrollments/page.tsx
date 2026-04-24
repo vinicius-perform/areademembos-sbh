@@ -14,7 +14,7 @@ import { supabase } from '@/lib/supabase';
 export default async function AdminEnrollments() {
   const { data: users } = await supabase
     .from('users')
-    .select('id, name, email, plan_type, created_at')
+    .select('id, name, email, plan_type, created_at, password')
     .order('created_at', { ascending: false });
 
   return (
@@ -89,7 +89,8 @@ export default async function AdminEnrollments() {
                         id: user.id, 
                         name: user.name, 
                         email: user.email, 
-                        plan_type: user.plan_type 
+                        plan_type: user.plan_type,
+                        password: user.password 
                       }} 
                     />
                   </TableCell>

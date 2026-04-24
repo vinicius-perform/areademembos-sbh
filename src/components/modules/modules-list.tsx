@@ -143,8 +143,8 @@ export function ModulesList({ modules }: { modules: any[] }) {
                 className={`border border-white/5 rounded-2xl bg-black/40 backdrop-blur-2xl overflow-hidden transition-all duration-500 ${isArchiving === module.id ? 'opacity-50 pointer-events-none' : 'hover:border-primary/20'}`}
               >
                 <AccordionTrigger className="hover:no-underline px-6 py-6 group">
-                  <div className="flex items-center justify-between w-full pr-4 text-left">
-                    <div className="flex flex-row items-center gap-6">
+                  <div className="flex items-center w-full pr-4 text-left">
+                    <div className="flex flex-row items-center gap-6 min-w-0 flex-1">
                       <div className="h-10 w-6 flex items-center justify-center border-r border-white/5 pr-4">
                          <GripVertical className="h-4 w-4 text-zinc-700 group-hover:text-primary transition-colors cursor-grab" />
                       </div>
@@ -158,16 +158,16 @@ export function ModulesList({ modules }: { modules: any[] }) {
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <span className="font-heading font-bold text-white text-lg block tracking-tight uppercase group-hover:text-primary transition-colors">{module.title}</span>
-                        {module.description && <span className="text-xs text-zinc-500 block truncate font-medium mt-1 uppercase tracking-widest">{module.description}</span>}
+                        <span className="font-heading font-bold text-white text-lg block tracking-tight uppercase group-hover:text-primary transition-colors truncate max-w-[480px]" title={module.title}>{module.title}</span>
+                        {module.description && <span className="text-xs text-zinc-500 block truncate font-medium mt-1 uppercase tracking-widest max-w-[600px]" title={module.description}>{module.description}</span>}
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 shrink-0">
+                    <div className="flex items-center gap-4 shrink-0 ml-auto">
                       <Badge variant="outline" className="h-7 px-3 border-white/10 text-zinc-400 bg-white/5 font-bold tracking-widest text-[9px]">
                         {module.lessons?.length || 0} CONTEÚDOS
                       </Badge>
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                      <div className="flex items-center gap-2 transition-all duration-300">
                          <Button onClick={(e) => handleEdit(e, module)} disabled={isArchiving === module.id} variant="glass" size="icon" className="h-9 w-9">
                            <Edit2 className="h-4 w-4" />
                          </Button>
@@ -200,16 +200,16 @@ export function ModulesList({ modules }: { modules: any[] }) {
                               <Video className="h-4 w-4 text-zinc-500 group-hover/item:text-primary transition-colors" />
                             </div>
                             <div className="min-w-0 flex flex-col items-start gap-1">
-                              <p className="font-bold text-white text-xs truncate flex items-center gap-3 tracking-wide">
-                                {lesson.title}
+                              <p className="font-bold text-white text-xs flex items-center gap-3 tracking-wide w-full overflow-hidden">
+                                <span className="truncate max-w-[400px]" title={lesson.title}>{lesson.title}</span>
                                 {lesson.is_premium && (
-                                  <Badge variant="premium" className="h-4 px-2 text-[8px] tracking-[0.2em]">PREMIUM</Badge>
+                                  <Badge variant="premium" className="h-4 px-2 text-[8px] tracking-[0.2em] shrink-0">PREMIUM</Badge>
                                 )}
                               </p>
-                              <p className="text-[9px] text-zinc-600 truncate font-medium uppercase tracking-widest">{lesson.video_url}</p>
+                              <p className="text-[9px] text-zinc-600 truncate font-medium uppercase tracking-widest" title={lesson.video_url}>{lesson.video_url}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                          <div className="flex items-center gap-2 transition-opacity">
                             <Button onClick={() => handleEditLesson(lesson)} disabled={isDeletingLesson === lesson.id} variant="ghost" size="icon" className="h-8 w-8 text-zinc-500 hover:text-white">
                               <Edit2 className="h-3.5 w-3.5" />
                             </Button>

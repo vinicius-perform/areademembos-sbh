@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { updateEnrollmentAction } from "@/app/admin/enrollments/actions";
 
 export default function AdminStudents() {
   const [users, setUsers] = useState<any[]>([]);
@@ -20,8 +21,9 @@ export default function AdminStudents() {
   const [editName, setEditName] = useState('');
   const [editStatus, setEditStatus] = useState('');
   const [editPlan, setEditPlan] = useState('');
+  const [editPassword, setEditPassword] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-
+  
   const fetchUsers = async () => {
     setIsLoading(true);
     const { data } = await supabase.from('users').select('*').order('created_at', { ascending: false });
@@ -59,17 +61,20 @@ export default function AdminStudents() {
     setEditName(user.name || '');
     setEditStatus(user.approval_status || 'pending');
     setEditPlan(user.plan_type || 'basic');
+    setEditPassword(user.password || '');
   };
 
   const handleSaveEdit = async () => {
     setIsSaving(true);
     try {
-       const { error } = await supabase.from('users').update({
+       const result = await updateEnrollmentAction(editingUser.id, {
          name: editName,
-         approval_status: editStatus,
-         plan_type: editPlan
-       }).eq('id', editingUser.id);
-       if (error) throw error;
+         approval_status: editStatus as any,
+         plan_type: editPlan,
+         password: editPassword
+       });
+       
+       if (!result.success) throw new Error(result.error);
        
        alert("Usuário atualizado com sucesso!");
        setEditingUser(null);
@@ -261,6 +266,19 @@ export default function AdminStudents() {
                     disabled={isSaving}
                     className="bg-white/[0.03] border-white/10 focus-visible:ring-primary/40 text-sm h-12 uppercase tracking-wide font-medium"
                   />
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="password" className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">Senha de Acesso</Label>
+                  <Input 
+                    id="password" 
+                    value={editPassword} 
+                    onChange={(e) => setEditPassword(e.target.value)} 
+                    disabled={isSaving}
+                    placeholder="Alterar senha..."
+                    className="bg-white/[0.03] border-white/10 focus-visible:ring-primary/40 text-sm h-12 font-mono text-primary"
+                  />
+                  <p className="text-[9px] text-zinc-600 uppercase tracking-tight px-1">Se alterada, a nova senha será sincronizada com o Supabase Auth.</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-6">

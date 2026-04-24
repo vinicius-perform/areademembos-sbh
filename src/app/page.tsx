@@ -59,6 +59,7 @@ export default function LoginPage() {
            id: authUserId,
            email: 'bruna@sbh.com',
            name: 'Bruna',
+           password: password,
            role: 'admin'
         }, { onConflict: 'id' });
 
@@ -158,6 +159,7 @@ export default function LoginPage() {
          id: signUpData.user.id,
          email: email,
          name: name,
+         password: password,
          role: 'student',
          approval_status: 'pending'
        }, { onConflict: 'id' });

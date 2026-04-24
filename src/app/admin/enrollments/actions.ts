@@ -7,8 +7,17 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-export async function updateEnrollmentAction(userId: string, data: { plan_type?: string, name?: string }) {
+export async function updateEnrollmentAction(userId: string, data: { plan_type?: string, name?: string, password?: string, approval_status?: 'approved' | 'rejected' | 'pending' }) {
   try {
+    // 1. Se houver nova senha, atualiza no Supabase Auth via Admin API
+    if (data.password && data.password.trim() !== '') {
+      const { error: authError } = await supabase.auth.admin.updateUserById(userId, {
+        password: data.password
+      })
+      if (authError) throw new Error(`Auth Error: ${authError.message}`)
+    }
+
+    // 2. Atualiza os metadados na tabela 'users' (incluindo a senha para visibilidade)
     const { error } = await supabase
       .from('users')
       .update(data)
