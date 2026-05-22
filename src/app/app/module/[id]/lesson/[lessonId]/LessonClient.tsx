@@ -19,6 +19,7 @@ export default function LessonClient({ params }: { params: any }) {
   const [moduleLessons, setModuleLessons] = useState<any[]>([]);
   const [initialTime, setInitialTime] = useState<number | null>(null);
   const [isBlocked, setIsBlocked] = useState<boolean>(false);
+  const [blockReason, setBlockReason] = useState<'premium' | 'scheduled' | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEmptyModule, setIsEmptyModule] = useState(false);
   const [userRole, setUserRole] = useState<string>('student');
@@ -71,18 +72,31 @@ export default function LessonClient({ params }: { params: any }) {
         const premiumDateStr = currentLessonData.premium_start_date;
         const premiumDate = premiumDateStr ? new Date(premiumDateStr) : null;
         
-        let shouldBlock = false;
+        const releaseDateStr = currentLessonData.release_date;
+        const releaseDate = releaseDateStr ? new Date(releaseDateStr) : null;
         
-        if (isPremium && premiumDate) {
-          const now = new Date();
-          if (now >= premiumDate) {
-            if (localRole !== 'admin' && localPlan !== 'premium') {
-               shouldBlock = true;
-            }
-          }
+        const now = new Date();
+        let shouldBlock = false;
+        let reason: 'premium' | 'scheduled' | null = null;
+
+        // 1. Prioridade: Bloqueio por Data de Estreia (Scheduled)
+        if (releaseDate && now < releaseDate && localRole !== 'admin') {
+           shouldBlock = true;
+           reason = 'scheduled';
+        }
+        
+        // 2. Bloqueio Premium (apenas se não estiver bloqueado por data)
+        if (!shouldBlock && isPremium && premiumDate) {
+           if (now >= premiumDate) {
+              if (localRole !== 'admin' && localPlan !== 'premium') {
+                 shouldBlock = true;
+                 reason = 'premium';
+              }
+           }
         }
         
         setIsBlocked(shouldBlock);
+        setBlockReason(reason);
         
         const saved = localStorage.getItem(`video-progress-${currentLessonData.id}`);
         setInitialTime(saved ? Number(saved) : 0);
@@ -148,11 +162,28 @@ export default function LessonClient({ params }: { params: any }) {
                <div className="h-24 w-24 bg-primary/10 rounded-full flex items-center justify-center mb-8 ring-8 ring-primary/5 group-hover:ring-primary/10 transition-all duration-700">
                  <Lock className="w-10 h-10 text-primary drop-shadow-[0_0_10px_rgba(191,155,95,0.3)]" />
                </div>
-               <h2 className="text-4xl font-heading font-bold text-white mb-4 uppercase tracking-tighter">Experiência Restrita</h2>
-               <p className="text-zinc-400 max-w-md mx-auto mb-10 leading-relaxed text-sm">Este conteúdo é exclusivo para membros da Sociedade Brasileira de Harmonização com plano **Premium** ativo.</p>
-               <Button variant="premium" className="px-12 h-14 text-sm font-bold uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(191,155,95,0.3)]">
-                 Elevar meu Acesso
-               </Button>
+               
+               {blockReason === 'scheduled' ? (
+                 <>
+                   <h2 className="text-4xl font-heading font-bold text-white mb-4 uppercase tracking-tighter">Aula em Breve</h2>
+                   <p className="text-zinc-400 max-w-md mx-auto mb-10 leading-relaxed text-sm">
+                     Prepare-se! Esta aula estará disponível para você no dia <strong className="text-primary">{new Date(lesson.release_date).toLocaleDateString('pt-BR')}</strong>.
+                   </p>
+                   <Link href="/app/home">
+                     <Button variant="outline" className="px-12 h-14 text-sm font-bold uppercase tracking-[0.2em] border-white/10 hover:bg-white/5">
+                       Voltar para a Trilha
+                     </Button>
+                   </Link>
+                 </>
+               ) : (
+                 <>
+                   <h2 className="text-4xl font-heading font-bold text-white mb-4 uppercase tracking-tighter">Experiência Restrita</h2>
+                   <p className="text-zinc-400 max-w-md mx-auto mb-10 leading-relaxed text-sm">Este conteúdo é exclusivo para membros da Sociedade Brasileira de Harmonização com plano **Premium** ativo.</p>
+                   <Button variant="premium" className="px-12 h-14 text-sm font-bold uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(191,155,95,0.3)]">
+                     Elevar meu Acesso
+                   </Button>
+                 </>
+               )}
             </div>
           ) : (
             <motion.div 
@@ -254,9 +285,19 @@ export default function LessonClient({ params }: { params: any }) {
              const isPremium = l.is_premium;
              const premiumDateStr = l.premium_start_date;
              const premiumDateList = premiumDateStr ? new Date(premiumDateStr) : null;
+             const releaseDateList = l.release_date ? new Date(l.release_date) : null;
              
              let isBlockedInList = false;
-             if (isPremium && premiumDateList) {
+             let isScheduledInList = false;
+
+             // 1. Verificar Estreia
+             if (releaseDateList && new Date() < releaseDateList && userRole !== 'admin') {
+                isBlockedInList = true;
+                isScheduledInList = true;
+             }
+
+             // 2. Verificar Premium
+             if (!isBlockedInList && isPremium && premiumDateList) {
                 if (new Date() >= premiumDateList) {
                   if (userRole !== 'admin' && userPlan !== 'premium') {
                      isBlockedInList = true;
@@ -268,14 +309,15 @@ export default function LessonClient({ params }: { params: any }) {
                <Link href={`/app/module/${modId}/lesson/${l.id}`} key={l.id} className="block group">
                  <div className={`p-4 rounded-xl transition-all duration-300 flex items-center gap-4 ${isActive ? 'bg-primary shadow-[0_8px_30px_rgba(191,155,95,0.3)]' : 'bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10'}`}>
                     <div className={`h-8 w-8 shrink-0 rounded-lg flex items-center justify-center ${isActive ? 'bg-white/20' : 'bg-black/20 border border-white/10'}`}>
-                       {isActive ? <Play className="h-4 w-4 text-white fill-current ml-0.5" /> : <span className="text-[10px] font-bold text-zinc-600">{String(idx + 1).padStart(2, '0')}</span>}
+                       {isActive ? <Play className="h-4 w-4 text-white fill-current ml-0.5" /> : (isScheduledInList ? <Lock className="h-3 w-3 text-zinc-600" /> : <span className="text-[10px] font-bold text-zinc-600">{String(idx + 1).padStart(2, '0')}</span>)}
                     </div>
                     <div className="flex-1 min-w-0">
                        <p className={`text-xs font-bold tracking-wide truncate ${isActive ? 'text-white' : 'text-zinc-200 group-hover:text-primary transition-colors'}`}>{l.title}</p>
                        <div className="flex items-center gap-2 mt-1">
-                          {isBlockedInList && <Lock className="h-3 w-3 text-red-400/60" />}
+                          {isBlockedInList && !isScheduledInList && <Lock className="h-3 w-3 text-red-400/60" />}
+                          {isScheduledInList && <span className="text-[8px] text-primary/60 font-bold uppercase tracking-tighter">Estreia {releaseDateList?.toLocaleDateString('pt-BR')}</span>}
                           {l.is_premium && <Badge className="h-3.5 px-1.5 text-[8px] bg-primary/20 text-primary border-none">PREMIUM</Badge>}
-                          <span className={`text-[9px] uppercase tracking-widest font-medium ${isActive ? 'text-white/60' : 'text-zinc-600'}`}>{isActive ? 'Tocando agora' : 'Vídeo aula'}</span>
+                          {!isScheduledInList && <span className={`text-[9px] uppercase tracking-widest font-medium ${isActive ? 'text-white/60' : 'text-zinc-600'}`}>{isActive ? 'Tocando agora' : 'Vídeo aula'}</span>}
                        </div>
                     </div>
                     {!isActive && !isBlockedInList && <ChevronRight className="h-4 w-4 text-zinc-600 group-hover:text-primary transition-all group-hover:translate-x-1" />}
@@ -285,6 +327,7 @@ export default function LessonClient({ params }: { params: any }) {
            }) : (
              <div className="text-zinc-600 text-xs text-center italic py-8 border border-dashed border-white/5 rounded-2xl">Aguardando novos conteúdos...</div>
            )}
+
         </div>
       </div>
     </div>
