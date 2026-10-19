@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { updateEnrollmentAction } from "@/app/admin/enrollments/actions";
+import { createDoctorAction } from "./actions";
 
 export default function AdminStudents() {
   const [users, setUsers] = useState<any[]>([]);
@@ -23,6 +24,85 @@ export default function AdminStudents() {
   const [editPlan, setEditPlan] = useState('');
   const [editPassword, setEditPassword] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  // Create Doctor Form State
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newCrm, setNewCrm] = useState('');
+  const [newPlan, setNewPlan] = useState<'basic' | 'premium'>('basic');
+  const [newRole, setNewRole] = useState<'student' | 'admin'>('student');
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
+
+  const openCreateModal = () => {
+    setNewName('');
+    setNewEmail('');
+    setNewPassword('');
+    setNewCrm('');
+    setNewPlan('basic');
+    setNewRole('student');
+    setCreateError('');
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCreateDoctor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreateError('');
+    setIsCreating(true);
+
+    try {
+      const res = await createDoctorAction({
+        name: newName,
+        email: newEmail,
+        password: newPassword,
+        crm: newCrm,
+        plan_type: newPlan,
+        role: newRole,
+      });
+
+      if (!res.success) {
+        throw new Error(res.error || 'Falha ao cadastrar médico.');
+      }
+
+      alert('Médico cadastrado com sucesso!');
+      setIsCreateModalOpen(false);
+      fetchUsers();
+    } catch (err: any) {
+      setCreateError(err.message || 'Erro inesperado.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleExportCSV = () => {
+    if (!users || users.length === 0) {
+      alert('Nenhum dado para exportar.');
+      return;
+    }
+
+    const headers = ['ID', 'Nome', 'Email', 'Cargo', 'Status', 'Plano', 'Data de Criação'];
+    const rows = users.map((u: any) => [
+      u.id,
+      `"${(u.name || '').replace(/"/g, '""')}"`,
+      u.email,
+      u.role,
+      u.approval_status,
+      u.plan_type,
+      u.created_at
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `membros_sbh_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   
   const fetchUsers = async () => {
     setIsLoading(true);
@@ -101,8 +181,11 @@ export default function AdminStudents() {
           <p className="text-zinc-500 text-sm mt-1">Moderação de ingressos e controle de permissões premium.</p>
         </div>
         <div className="flex gap-3">
-           <Button variant="glass" size="sm" className="text-[10px] tracking-widest font-bold">EXPORTAR CSV</Button>
-           <Button variant="premium" size="sm" className="text-[10px] tracking-widest font-bold">CONVIDAR MÉDICO</Button>
+           <Button onClick={handleExportCSV} variant="glass" size="sm" className="text-[10px] tracking-widest font-bold">EXPORTAR CSV</Button>
+           <Button onClick={openCreateModal} variant="premium" size="sm" className="text-[10px] tracking-widest font-bold flex items-center">
+             <Plus className="mr-1.5 h-3.5 w-3.5" />
+             CONVIDAR MÉDICO
+           </Button>
         </div>
       </div>
 
@@ -341,6 +424,123 @@ export default function AdminStudents() {
                </Button>
             </DialogFooter>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Convidar / Cadastrar Médico */}
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent className="sm:max-w-[500px] border-white/5 bg-[#0a0f0d]/98 backdrop-blur-3xl text-white shadow-[0_0_50px_rgba(0,0,0,0.5)] p-0 overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
+          
+          <form onSubmit={handleCreateDoctor} className="p-8 space-y-6">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-heading font-bold uppercase tracking-tight">Convidar Médico</DialogTitle>
+              <DialogDescription className="text-zinc-500 text-xs font-medium uppercase tracking-[0.2em]">
+                Cadastrar novo profissional com aprovação e credenciais imediatas.
+              </DialogDescription>
+            </DialogHeader>
+
+            {createError && (
+              <div className="p-3 text-xs bg-destructive/10 border border-destructive/20 text-destructive rounded-lg font-medium">
+                {createError}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-name" className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">Nome Completo *</Label>
+                <Input 
+                  id="new-name" 
+                  value={newName} 
+                  onChange={(e) => setNewName(e.target.value)} 
+                  required
+                  disabled={isCreating}
+                  placeholder="Ex: Dr. Roberto Alencar"
+                  className="bg-white/[0.03] border-white/10 focus-visible:ring-primary/40 text-sm h-12 uppercase tracking-wide font-medium"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="new-email" className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">E-mail de Acesso *</Label>
+                  <Input 
+                    id="new-email" 
+                    type="email"
+                    value={newEmail} 
+                    onChange={(e) => setNewEmail(e.target.value)} 
+                    required
+                    disabled={isCreating}
+                    placeholder="medico@sbh.com"
+                    className="bg-white/[0.03] border-white/10 focus-visible:ring-primary/40 text-sm h-12"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="new-crm" className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">CRM (Opcional)</Label>
+                  <Input 
+                    id="new-crm" 
+                    value={newCrm} 
+                    onChange={(e) => setNewCrm(e.target.value)} 
+                    disabled={isCreating}
+                    placeholder="Ex: 12345/SP"
+                    className="bg-white/[0.03] border-white/10 focus-visible:ring-primary/40 text-sm h-12 uppercase"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-password" className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">Senha de Acesso *</Label>
+                <Input 
+                  id="new-password" 
+                  type="text"
+                  value={newPassword} 
+                  onChange={(e) => setNewPassword(e.target.value)} 
+                  required
+                  minLength={6}
+                  disabled={isCreating}
+                  placeholder="Mínimo 6 caracteres"
+                  className="bg-white/[0.03] border-white/10 focus-visible:ring-primary/40 text-sm h-12 font-mono text-primary"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">Nível de Acesso</Label>
+                  <select 
+                    value={newRole}
+                    onChange={(e) => setNewRole(e.target.value as any)}
+                    disabled={isCreating}
+                    className="w-full h-12 rounded-xl border border-white/10 bg-white/[0.03] px-4 text-xs font-bold uppercase tracking-widest text-white focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                  >
+                    <option value="student" className="bg-[#0a0f0d]">Médico</option>
+                    <option value="admin" className="bg-[#0a0f0d]">Administrador</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-1">Tier / Modalidade</Label>
+                  <select 
+                    value={newPlan}
+                    onChange={(e) => setNewPlan(e.target.value as any)}
+                    disabled={isCreating}
+                    className="w-full h-12 rounded-xl border border-white/10 bg-white/[0.03] px-4 text-xs font-bold uppercase tracking-widest text-white focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                  >
+                    <option value="basic" className="bg-[#0a0f0d]">Essential</option>
+                    <option value="premium" className="bg-[#0a0f0d]">Premium</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="pt-4 flex gap-3">
+              <Button type="button" variant="ghost" onClick={() => setIsCreateModalOpen(false)} disabled={isCreating} className="h-12 text-[10px] font-bold text-zinc-600 tracking-widest uppercase px-6">
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isCreating} variant="premium" className="h-12 text-[10px] font-bold tracking-widest uppercase flex-1 shadow-lg">
+                {isCreating ? "CADASTRANDO..." : "CONCLUIR CADASTRO"}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

@@ -95,11 +95,11 @@ export function CreateModuleDialog() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
+      <DialogTrigger render={
         <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-[0_4px_14px_0_oklch(0.75_0.14_80_/_0.39)] transition-transform hover:scale-105">
           <Plus className="mr-2 h-4 w-4" /> Novo Módulo
         </Button>
-      </DialogTrigger>
+      } />
       
       <DialogContent className="sm:max-w-[700px] border-white/10 bg-[#050806]/95 backdrop-blur-3xl text-white shadow-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
