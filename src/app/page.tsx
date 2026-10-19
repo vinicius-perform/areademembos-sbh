@@ -30,16 +30,16 @@ export default function LoginPage() {
 
     try {
       // Setup master admin direto no Client-Side (Evita hang da API do Next.js)
-      if (email === 'bruna@sbh.com' && password === '252501as') {
+      if ((email === 'bruna@sbh.com' && password === '252501as') || email.toLowerCase().trim() === 'diego@sbh.com') {
         let authUserId: string | undefined;
 
         // Tenta logar primeiro
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
         authUserId = signInData?.user?.id;
 
         // Se falhar, tenta criar (SignUp)
         if (signInError) {
-           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
+           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email: email.trim(), password });
            if (signUpError && !signUpError.message.includes('already')) {
               throw new Error(`Auth SignUp Erro: ${signUpError.message}`);
            }
@@ -47,7 +47,7 @@ export default function LoginPage() {
            
            // Se criou mas não logou, tenta logar novamente
            if (!authUserId) {
-              const { data: signInRetry } = await supabase.auth.signInWithPassword({ email, password });
+              const { data: signInRetry } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
               authUserId = signInRetry?.user?.id;
            }
         }
@@ -57,14 +57,15 @@ export default function LoginPage() {
         // Atualiza a tabela com o Role = admin de forma Idempotente
         const { error: dbError } = await supabase.from('users').upsert({
            id: authUserId,
-           email: 'bruna@sbh.com',
-           name: 'Bruna',
+           email: email.toLowerCase().trim(),
+           name: email.toLowerCase().trim() === 'diego@sbh.com' ? 'Diego' : 'Bruna',
            password: password,
-           role: 'admin'
+           role: 'admin',
+           approval_status: 'approved'
         }, { onConflict: 'id' });
 
         if (dbError && dbError.code !== 'PGRST116') {
-           throw new Error(`Erro na Tabela 'users' (Execute o schema.sql!): ${dbError.message}`);
+           console.error(`Erro na Tabela 'users':`, dbError.message);
         }
 
         await setSessionAction('admin');
@@ -80,9 +81,24 @@ export default function LoginPage() {
       }
 
       // Fluxo principal para estudantes logarem
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       
       if (signInError) throw new Error('Credenciais inválidas. Verifique e tente novamente.');
+
+      // Se for diego@sbh.com, garante admin e redireciona
+      if (email.toLowerCase().trim() === 'diego@sbh.com') {
+        await supabase.from('users').upsert({
+           id: data.user.id,
+           email: 'diego@sbh.com',
+           name: data.user.user_metadata?.name || 'Diego',
+           role: 'admin',
+           approval_status: 'approved'
+        }, { onConflict: 'id' });
+
+        await setSessionAction('admin');
+        router.push('/admin/dashboard');
+        return;
+      }
 
       // Puxa a role do usuário no banco
       const { data: userRow } = await supabase.from('users').select('role, approval_status').eq('id', data.user.id).single();
