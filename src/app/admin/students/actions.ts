@@ -99,9 +99,20 @@ export async function createDoctorAction(formData: {
       return { success: false, error: `Erro no banco de dados: ${dbError.message}` }
     }
 
+    const newUser = {
+      id: authUserId,
+      email,
+      name,
+      password,
+      role,
+      plan_type,
+      approval_status: 'approved',
+      created_at: new Date().toISOString()
+    }
+
     revalidatePath('/admin/students')
     revalidatePath('/admin/enrollments')
-    return { success: true }
+    return { success: true, user: newUser }
   } catch (error: any) {
     console.error('Error creating doctor:', error)
     return { success: false, error: error.message || 'Erro inesperado ao cadastrar médico.' }

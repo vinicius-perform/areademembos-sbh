@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase';
 import { ModulesList } from '@/components/modules/modules-list';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 15;
 
 export default async function AdminModulesPage() {
   const { data: modules, error } = await supabase

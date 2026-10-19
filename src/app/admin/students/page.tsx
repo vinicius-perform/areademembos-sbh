@@ -66,9 +66,11 @@ export default function AdminStudents() {
         throw new Error(res.error || 'Falha ao cadastrar médico.');
       }
 
-      alert('Médico cadastrado com sucesso!');
+      if (res.user) {
+        setUsers(prev => [res.user, ...prev]);
+      }
       setIsCreateModalOpen(false);
-      fetchUsers();
+      fetchUsers(false);
     } catch (err: any) {
       setCreateError(err.message || 'Erro inesperado.');
     } finally {
@@ -104,34 +106,40 @@ export default function AdminStudents() {
     document.body.removeChild(link);
   };
   
-  const fetchUsers = async () => {
-    setIsLoading(true);
+  const fetchUsers = async (showLoading = true) => {
+    if (showLoading) setIsLoading(true);
     const { data } = await supabase.from('users').select('*').order('created_at', { ascending: false });
     if (data) setUsers(data);
-    setIsLoading(false);
+    if (showLoading) setIsLoading(false);
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsers(true);
   }, []);
 
   const handleApprove = async (userId: string) => {
+    const prevUsers = [...users];
+    // Atualização otimista imediata (0ms)
+    setUsers(prev => prev.map((u: any) => u.id === userId ? { ...u, approval_status: 'approved' } : u));
     try {
       const { error } = await supabase.from('users').update({ approval_status: 'approved' }).eq('id', userId);
       if (error) throw error;
-      fetchUsers();
     } catch (err: any) {
+      setUsers(prevUsers);
       alert(`Erro ao aprovar: ${err.message}`);
     }
   };
 
   const handleReject = async (userId: string) => {
     if (!confirm('Deseja realmente rejeitar este usuário? O acesso dele será bloqueado.')) return;
+    const prevUsers = [...users];
+    // Atualização otimista imediata (0ms)
+    setUsers(prev => prev.map((u: any) => u.id === userId ? { ...u, approval_status: 'rejected' } : u));
     try {
       const { error } = await supabase.from('users').update({ approval_status: 'rejected' }).eq('id', userId);
       if (error) throw error;
-      fetchUsers();
     } catch (err: any) {
+      setUsers(prevUsers);
       alert(`Erro ao rejeitar: ${err.message}`);
     }
   };
@@ -145,9 +153,23 @@ export default function AdminStudents() {
   };
 
   const handleSaveEdit = async () => {
+    if (!editingUser) return;
     setIsSaving(true);
+    const prevUsers = [...users];
+    const targetUserId = editingUser.id;
+    const updatedData = {
+      ...editingUser,
+      name: editName,
+      approval_status: editStatus,
+      plan_type: editPlan,
+    };
+
+    // Atualização otimista imediata e fecha modal sem travar UI
+    setUsers(prev => prev.map((u: any) => u.id === targetUserId ? { ...u, ...updatedData } : u));
+    setEditingUser(null);
+
     try {
-       const result = await updateEnrollmentAction(editingUser.id, {
+       const result = await updateEnrollmentAction(targetUserId, {
          name: editName,
          approval_status: editStatus as any,
          plan_type: editPlan,
@@ -155,11 +177,9 @@ export default function AdminStudents() {
        });
        
        if (!result.success) throw new Error(result.error);
-       
-       alert("Usuário atualizado com sucesso!");
-       setEditingUser(null);
-       fetchUsers();
+       fetchUsers(false);
     } catch (err: any) {
+       setUsers(prevUsers);
        alert(`Erro ao salvar usuário: ${err.message}`);
     } finally {
        setIsSaving(false);

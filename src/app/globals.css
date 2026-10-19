@@ -99,8 +99,29 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
   body {
     @apply bg-background text-foreground antialiased min-h-screen selection:bg-primary/20 selection:text-primary;
+    overflow-x: hidden;
+  }
+
+  /* Aceleracao de GPU para transicoes e hover sem jank */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: transform, opacity;
+  }
+
+  /* Otimizacao de renderizacao para listas longas */
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 100px;
   }
 
   .custom-scrollbar::-webkit-scrollbar {

@@ -1,13 +1,16 @@
 import { supabase } from '@/lib/supabase';
 import StudentHomeClient from '@/components/layout/student-home-client';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function StudentHome() {
-  const { data: config } = await supabase.from('home_config').select('*').eq('id', 1).single();
-  const { data: dbModules } = await supabase.from('modules').select('*').order('order', { ascending: true });
+  const [configResult, modulesResult] = await Promise.all([
+    supabase.from('home_config').select('*').eq('id', 1).single(),
+    supabase.from('modules').select('*').order('order', { ascending: true })
+  ]);
   
-  const modulesToUse = dbModules || [];
+  const config = configResult.data;
+  const modulesToUse = modulesResult.data || [];
 
   return <StudentHomeClient config={config} modulesToUse={modulesToUse} />;
 }

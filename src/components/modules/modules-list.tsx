@@ -151,7 +151,7 @@ export function ModulesList({ modules }: { modules: any[] }) {
                       
                       <div className="h-16 w-12 relative flex-shrink-0 rounded-xl overflow-hidden bg-black/50 border border-white/5 shadow-inner">
                          {module.cover_image_vertical ? (
-                            <img src={module.cover_image_vertical} alt={module.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                            <img src={module.cover_image_vertical} alt={module.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                          ) : (
                             <div className="absolute inset-0 flex items-center justify-center text-primary/20 bg-gradient-to-br from-white/5 to-transparent"><FolderOpen className="h-5 w-5" /></div>
                          )}
@@ -245,7 +245,7 @@ export function ModulesList({ modules }: { modules: any[] }) {
                 <div key={module.id} className="flex items-center justify-between p-5 bg-black/60 border border-white/5 rounded-2xl group/archived">
                    <div className="flex items-center gap-5">
                       <div className="h-12 w-10 relative flex-shrink-0 rounded-lg overflow-hidden bg-black/50 border border-white/5 grayscale opacity-30">
-                         {module.cover_image_vertical && <img src={module.cover_image_vertical} alt={module.title} className="absolute inset-0 w-full h-full object-cover" />}
+                         {module.cover_image_vertical && <img src={module.cover_image_vertical} alt={module.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />}
                       </div>
                       <div>
                          <span className="font-bold text-zinc-500 block text-xs uppercase tracking-wide">{module.title}</span>

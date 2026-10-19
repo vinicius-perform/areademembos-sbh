@@ -27,11 +27,13 @@ function ModuleRow({ title, modules }: { title: string, modules: any[] }) {
             className="snap-start shrink-0"
           >
             <Link href={`/app/module/${module.id}/lesson/first`} className="focus:outline-none block">
-              <Card className="w-[340px] h-[200px] overflow-hidden group relative border-white/5 bg-black/60 hover:border-primary/30 transition-all duration-500 shadow-2xl">
+              <Card className="w-[340px] h-[200px] overflow-hidden group relative border-white/5 bg-black/60 hover:border-primary/30 transition-all duration-500 shadow-2xl gpu-accelerated">
                 <img 
                   src={module.banner_image_horizontal || module.cover_image_vertical || 'https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=800&q=80'} 
                   alt={module.title}
-                  className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                  loading="lazy"
+                  decoding="async"
+                  className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 pointer-events-none"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#050806] via-transparent to-transparent opacity-90" />
                 
@@ -91,7 +93,8 @@ export default function StudentHomeClient({ config, modulesToUse }: { config: an
             transition={{ duration: 2.5, ease: "easeOut" }}
             src={banner.imageUrl}
             alt="Banner"
-            className="w-full h-full object-cover"
+            decoding="async"
+            className="w-full h-full object-cover pointer-events-none"
           />
           {/* Layered Overlays for Depth */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#050806] via-[#050806]/60 to-transparent" />

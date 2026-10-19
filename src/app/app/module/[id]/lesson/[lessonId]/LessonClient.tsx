@@ -27,7 +27,12 @@ export default function LessonClient({ params }: { params: any }) {
 
   useEffect(() => {
     async function init() {
-      const { data: { user } } = await supabase.auth.getUser();
+      const [authResult, lessonsResult] = await Promise.all([
+        supabase.auth.getUser(),
+        supabase.from('lessons').select('*').eq('module_id', modId)
+      ]);
+
+      const user = authResult.data?.user;
       let localRole = 'student';
       let localPlan = 'basic';
       
@@ -41,7 +46,8 @@ export default function LessonClient({ params }: { params: any }) {
          }
       }
 
-      const { data: allLessons, error: err } = await supabase.from('lessons').select('*').eq('module_id', modId);
+      const allLessons = lessonsResult.data;
+      const err = lessonsResult.error;
       
       let sortedLessons: any[] = [];
       if (allLessons) {
@@ -61,8 +67,11 @@ export default function LessonClient({ params }: { params: any }) {
       if (lessId === 'first') {
          currentLessonData = sortedLessons[0];
       } else {
-         const { data: dbLesson } = await supabase.from('lessons').select('*').eq('id', lessId).single();
-         if (dbLesson) currentLessonData = dbLesson;
+         currentLessonData = sortedLessons.find((l: any) => String(l.id) === String(lessId));
+         if (!currentLessonData) {
+            const { data: dbLesson } = await supabase.from('lessons').select('*').eq('id', lessId).single();
+            if (dbLesson) currentLessonData = dbLesson;
+         }
       }
       
       if (currentLessonData) {

@@ -5,7 +5,7 @@ import { PlaySquare, Users, Video, BookOpenCheck, TrendingUp, AlertCircle } from
 import { supabase } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 15;
 
 export default async function AdminDashboard() {
   const [{ count: modulesCount }, { count: lessonsCount }, { count: usersCount }, { data: latestUsers }] = await Promise.all([
