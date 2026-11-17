@@ -1,0 +1,31 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # Executa todos os dias às 12:00 UTC (09:00 BRT)
+    - cron: '0 12 * * *'
+  workflow_dispatch: # Permite disparar manualmente pela aba Actions do GitHub
+
+jobs:
+  ping-supabase:
+    name: Ping Supabase Database
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send keep-alive ping to Supabase REST API
+        run: |
+          SUPABASE_URL="https://brmkhfvmjgwtbotiaooa.supabase.co"
+          ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJybWtoZnZtamd3dGJvdGlhb29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NjMyNTMsImV4cCI6MjA4OTUzOTI1M30.5fKNXOiLAhcoMN1y5UB8thflyjsoo1rHngrwi22KmKM"
+          
+          echo "Disparando requisição de keep-alive para o Supabase..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: $ANON_KEY" \
+            -H "Authorization: Bearer $ANON_KEY" \
+            "$SUPABASE_URL/rest/v1/modules?select=id&limit=1")
+          
+          echo "Status HTTP recebido: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "✅ Supabase consultado com sucesso! Atividade registrada no banco de dados para evitar pausa."
+          else
+            echo "⚠️ Aviso: Resposta inesperada do Supabase (HTTP $HTTP_STATUS)."
+            exit 1
+          fi
